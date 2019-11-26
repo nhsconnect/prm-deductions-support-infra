@@ -36,9 +36,11 @@ function prepare_certs {
     export CA_PASSWORD=$(fetch_secret "/NHS/${ENVIRONMENT}/CA/password")
   fi
   if [[  ! -f ${PKI_DIR}/certs/ca.crt ]]; then
+    mkdir -p ${PKI_DIR}/certs
     fetch_secret "/NHS/${ENVIRONMENT}/CA/certs/ca.crt" > "${PKI_DIR}/certs/ca.crt"
   fi
   if [[ ! -f ${PKI_DIR}/private/ca.key ]]; then
+    mkdir -p ${PKI_DIR}/private
     fetch_secret "/NHS/${ENVIRONMENT}/CA/private/ca.key" > "${PKI_DIR}/private/ca.key"
   fi
   if [[  -f "${generated_certs_dir}/${keys_file_name}.key" ]]; then
@@ -85,7 +87,7 @@ EOF
   # openssl req -newkey rsa:4096 -keyout ${keys_file_name}.key -out ${keys_file_name}.csr
   # 3. Generate the server certificate (${keys_file_name}.crt) using the ca.key, ca.crt and ${keys_file_name}.csr:
   openssl x509 -req -in ${keys_file_name}.csr -CA ${PKI_DIR}/certs/ca.crt -CAkey ${PKI_DIR}/private/ca.key \
-    -CAcreateserial -out ${keys_file_name}.crt -days 36500 \
+    -CAcreateserial -out ${keys_file_name}.crt -days 365 \
     -extensions v3_ext -extfile ${CERTIFICATES_DIR}/csr.conf -passin pass:${CA_PASSWORD}
 
   mkdir -p ${generated_certs_dir}
