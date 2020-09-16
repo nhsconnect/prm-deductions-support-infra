@@ -4,6 +4,14 @@ This is the minimal, very first setup of terraform backend in S3 and DynamoDB.
 
 The terraform state produced in this repository is pushed to a separate bucked with AWS CLI.
 
+To deploy infrastructure, run the following commands:
+
+``` terraform init ```
+
+``` terraform apply ```
+
+As a note, the terraform state is local.
+
 # Utility scripts
 
 Folder `utils` contains common scripts to be used across projects.
@@ -16,6 +24,7 @@ export AWS_ACCESS_KEY_ID=***********
 export AWS_SECRET_ACCESS_KEY=**************************
 unset AWS_SESSION_TOKEN
 ```
+
 
 Enter docker container with openssl and AWS CLI by typing:
 ```
