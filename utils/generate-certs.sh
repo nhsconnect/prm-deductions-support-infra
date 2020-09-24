@@ -33,15 +33,15 @@ function prepare_certs {
   fi
 
   if [[ -z ${CA_PASSWORD} ]]; then
-    export CA_PASSWORD=$(fetch_secret "/NHS/${ENVIRONMENT}/CA/password")
+    export CA_PASSWORD=$(fetch_secret "/repo/${ENVIRONMENT}/prm-deductions-support-infra/user-input/ca-password")
   fi
   if [[  ! -f ${PKI_DIR}/certs/ca.crt ]]; then
     mkdir -p ${PKI_DIR}/certs
-    fetch_secret "/NHS/${ENVIRONMENT}/CA/certs/ca.crt" > "${PKI_DIR}/certs/ca.crt"
+    fetch_secret "/repo/${ENVIRONMENT}/prm-deductions-support-infra/user-input/ca-crt" > "${PKI_DIR}/certs/ca.crt"
   fi
   if [[ ! -f ${PKI_DIR}/private/ca.key ]]; then
     mkdir -p ${PKI_DIR}/private
-    fetch_secret "/NHS/${ENVIRONMENT}/CA/private/ca.key" > "${PKI_DIR}/private/ca.key"
+    fetch_secret "/repo/${ENVIRONMENT}/prm-deductions-support-infra/user-input/ca-key" > "${PKI_DIR}/private/ca.key"
   fi
   if [[  -f "${generated_certs_dir}/${keys_file_name}.key" ]]; then
     echo "${generated_certs_dir}/${keys_file_name}.key already exist"
