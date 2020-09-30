@@ -13,5 +13,6 @@ resource "aws_dynamodb_table" "prm-deductions-terraform-table" {
 
   tags = {
      Name = "Terraform Lock Table"
+     CreatedBy = "prm-deductions-support-infra"
   }
 }

@@ -19,6 +19,7 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state" {
 
   tags = {
      Name = "Terraform states of deductions infrastructure"
+     CreatedBy = "prm-deductions-support-infra"
   }
 }
 
@@ -43,5 +44,6 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state-store" {
 
   tags = {
      Name = "Terraform state of the prm-deductions-support-infra"
+     CreatedBy = "prm-deductions-support-infra"
   }
 }
