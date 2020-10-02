@@ -91,3 +91,19 @@ To issue certificates for `example.dev.patient-deductions.nhs.uk` run
 ```
 
 The files matching pattern of `example.dev*` will be generated in `./utils/site-certs/*`. 
+
+## AWS SSM Parameters Design Principles
+
+When creating the new ssm keys, please follow the agreed convention as per the design specified below:
+
+* all parts of the keys are lower case
+* the words are separated by dashes (`kebab case`)
+* `env` is optional
+  
+### Design:
+Please follow this design to ensure the ssm keys are easy to maintain and navigate through:
+
+| Type               | Design                                  | Example                                               |
+| -------------------| ----------------------------------------| ------------------------------------------------------|
+| **User-specified** |`/repo/<env>?/user-input/`               | `/repo/${var.environment}/user-input/db-username`     |
+| **Auto-generated** |`/repo/<env>?/output/<name-of-git-repo>/`| `/repo/output/prm-deductions-base-infra/root-zone-id` |
