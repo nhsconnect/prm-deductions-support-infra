@@ -68,30 +68,6 @@ Run the following command to confirm the role was assumed correctly:
 
 `aws sts get-caller-identity`
 
-
-## Generating certificates
-
-Export your AWS credentials in shell (if you have credentials in `~/.aws/credentials` that will work too):
-```
-export AWS_ACCESS_KEY_ID=<your-aws-access-key-id>
-export AWS_SECRET_ACCESS_KEY=<your-aws-secret-access-key>
-unset AWS_SESSION_TOKEN
-```
-
-Enter docker container with openssl and AWS CLI by typing:
-
-`dojo`
-
-at the root of this repository.
-
-To issue certificates for `example.dev.patient-deductions.nhs.uk` run
-
-```
-./utils/generate-certs.sh -f example.dev -d example.dev.patient-deductions.nhs.uk
-```
-
-The files matching pattern of `example.dev*` will be generated in `./utils/site-certs/*`. 
-
 ## AWS SSM Parameters Design Principles
 
 When creating the new ssm keys, please follow the agreed convention as per the design specified below:
