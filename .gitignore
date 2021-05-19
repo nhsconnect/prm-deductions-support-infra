@@ -2,3 +2,4 @@
 /terraform.tfstate*
 /utils/CA/
 /utils/site-certs/
+/*.tfplan

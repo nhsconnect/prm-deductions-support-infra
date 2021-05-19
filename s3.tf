@@ -1,6 +1,10 @@
+locals {
+  prefix = var.prefix == "" ? "" : "${var.prefix}-"
+}
+
 # S3 bucket to hold terraform states of other repos
 resource "aws_s3_bucket" "prm-deductions-terraform-state" {
-  bucket = "prm-deductions-terraform-state"
+  bucket = "prm-deductions-${local.prefix}terraform-state"
   acl    = "private"
 
   # To allow rolling back states
@@ -25,7 +29,7 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state" {
 
 # S3 bucket to hold terraform state produced in this repo
 resource "aws_s3_bucket" "prm-deductions-terraform-state-store" {
-  bucket = "prm-deductions-terraform-state-store"
+  bucket = "prm-deductions-${local.prefix}terraform-state-store"
   acl    = "private"
 
   # To allow rolling back states
@@ -46,4 +50,8 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state-store" {
      Name = "Terraform state of the prm-deductions-support-infra"
      CreatedBy = "prm-deductions-support-infra"
   }
+}
+
+output "state_store" {
+  value = "prm-deductions-${local.prefix}terraform-state-store"
 }

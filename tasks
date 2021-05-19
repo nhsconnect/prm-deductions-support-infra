@@ -1,0 +1,62 @@
+#!/bin/bash
+
+set -Eeo pipefail
+
+AWS_REGION=eu-west-2
+
+function check_env {
+  if [[ -z "${NHS_ENVIRONMENT}" ]]; then
+    echo "Must set NHS_ENVIRONMENT"
+    exit 1
+  fi
+}
+
+function tf_plan {
+  check_env
+
+  operation=$1
+
+  terraform init
+  terraform get # modules
+  if [[ "${operation}" == "create" ]]; then
+    terraform plan -var-file=${NHS_ENVIRONMENT}.tfvars -out="${NHS_ENVIRONMENT}.tfplan"
+  elif [[ "${operation}" == "destroy" ]]; then
+    terraform plan -var-file=${NHS_ENVIRONMENT}.tfvars -out="${NHS_ENVIRONMENT}.tfplan" -destroy
+  else
+    echo "Unknown operation (should be create or destroy), got: ${operation}"
+    exit 1
+  fi
+}
+
+function tf_apply {
+  terraform init
+  terraform get # modules
+  terraform apply ${NHS_ENVIRONMENT}.tfplan
+  terraform output -json > ${NHS_ENVIRONMENT}-tf-out.json
+}
+
+command="$1"
+case "${command}" in
+  tf)
+      dojo "bash"
+      ;;
+  _tf_plan)
+      check_env
+      if [ -f ${NHS_ENVIRONMENT}-tf-out.json ]; then
+        bucket_name=$(cat ${NHS_ENVIRONMENT}-tf-out.json | jq -r ".state_store.value")
+        aws s3 cp "s3://${bucket_name}/terraform.tfstate" terraform.tfstate
+      fi
+      tf_plan "$2"
+      ;;
+  tf_plan)
+      dojo "./tasks _tf_plan $2"
+      ;;
+  _tf_apply)
+      tf_apply
+      bucket_name=$(cat ${NHS_ENVIRONMENT}-tf-out.json | jq -r ".state_store.value")
+      aws s3 cp terraform.tfstate "s3://${bucket_name}/terraform.tfstate"
+      ;;
+  tf_apply)
+      dojo "./tasks _tf_apply"
+      ;;
+esac
