@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -Eeo pipefail
+
+function create_build_trace_id {
+  if [ -z $GO_PIPELINE_NAME ]; then
+    export BUILD_TRACE_ID=local
+  else
+    git_hash=$(echo $GO_REVISION_GIT | cut -c 1-8)
+    export BUILD_TRACE_ID="gocd@$GO_PIPELINE_NAME@$GO_PIPELINE_COUNTER@$GO_STAGE_NAME@$GO_STAGE_COUNTER@$GO_JOB_NAME@$git_hash"
+  fi
+}
+
+function _get_aws_ssm_secret {
+  secret_id=$1
+  json=$(aws ssm get-parameter --with-decryption --region "eu-west-2" --name $secret_id)
+  if [ $? != 0 ]; then
+    >&2 echo "Failed to obtain AWS secret from SSM: $secret_id"
+    exit 5
+  fi
+  echo $json | jq -r ".Parameter.Value"
+}
+
+function _assume-ci-agent-role {
+  environment=$1
+  aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
+  create_build_trace_id
+
+  desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
+  desired_role_arn="arn:aws:iam::$desired_account_id:role/repository-ci-agent"
+
+  if [[ $aws_account_arn =~ "gocd_agent-prod" && $environment = "dev" ]]; then
+    echo "Assuming ci-agent-role in dev account"
+    json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
+
+    export AWS_ACCESS_KEY_ID="$(echo "$json" | jq -r .Credentials.AccessKeyId)"
+    export AWS_SECRET_ACCESS_KEY="$(echo "$json" | jq -r .Credentials.SecretAccessKey)"
+    export AWS_SESSION_TOKEN="$(echo "$json" | jq -r .Credentials.SessionToken)"
+  else
+    echo "Incorrect identity or environment"
+  fi
+}
+
+set +e
