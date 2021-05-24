@@ -26,11 +26,11 @@ function _assume-ci-agent-role {
   aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
-  desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
-  desired_role_arn="arn:aws:iam::$desired_account_id:role/repository-ci-agent"
-
   if [[ $aws_account_arn =~ "gocd_agent-prod" && $environment = "dev" ]]; then
     echo "Assuming ci-agent-role in dev account"
+
+    desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
+    desired_role_arn="arn:aws:iam::$desired_account_id:role/repository-ci-agent"
     json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
 
     export AWS_ACCESS_KEY_ID="$(echo "$json" | jq -r .Credentials.AccessKeyId)"
