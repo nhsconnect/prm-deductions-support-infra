@@ -2,6 +2,8 @@
 
 set -Eeo pipefail
 
+AWS_DEFAULT_REGION="eu-west-2"
+
 function create_build_trace_id {
   if [ -z $GO_PIPELINE_NAME ]; then
     export BUILD_TRACE_ID=local
@@ -22,6 +24,10 @@ function _get_aws_ssm_secret {
 }
 
 function _assume-ci-agent-role {
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  unset AWS_SESSION_TOKEN
+
   environment=$1
   aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
@@ -39,6 +45,23 @@ function _assume-ci-agent-role {
   else
     echo "Incorrect identity or environment"
   fi
+}
+
+function _docker_login {
+  echo Logging in to Amazon ECR...
+  eval $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+}
+
+function _promote-docker-image {
+  environment_from=$1
+  environment_to=$2
+  image repo name + image_tag=$3 // image_full_repo_name ???
+  # login with AWS
+  # login with ECR
+  # pull the image
+  # login with AWS to the next account
+  # login with ECR to the next account
+  # push the image
 }
 
 set +e
