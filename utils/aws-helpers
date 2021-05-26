@@ -49,7 +49,7 @@ function configure_docker_repository_uri {
 function assume-ci-agent-role {
   CURRENT_DIR=$(pwd)
   cd "$SCRIPT_DIR"
-  eval $(dojo -image "$DOJO_IMAGE_VERSION" "./aws-helpers _assume_ci_agent_role $1")
+  eval $(dojo -image "$DOJO_IMAGE_VERSION" "./aws-helpers assume_ci_agent_role $1")
   cd "$CURRENT_DIR"
 }
 
