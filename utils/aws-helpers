@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -Eeo pipefail
-
 AWS_DEFAULT_REGION="eu-west-2"
 
 function create_build_trace_id {
@@ -45,13 +43,6 @@ function _assume-ci-agent-role {
     >&2 echo "Build trace ID: $BUILD_TRACE_ID"
     json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
 
-    if [ $? != 0 ]; then
-      >&2 echo "Failed assuming role $desired_role_arn"
-      exit 5
-    else
-      >&2 echo "Successfully assumed role $desired_role_arn"
-    fi
-
     export AWS_ACCESS_KEY_ID="$(echo "$json" | jq -r .Credentials.AccessKeyId)"
     export AWS_SECRET_ACCESS_KEY="$(echo "$json" | jq -r .Credentials.SecretAccessKey)"
     export AWS_SESSION_TOKEN="$(echo "$json" | jq -r .Credentials.SessionToken)"
@@ -59,5 +50,3 @@ function _assume-ci-agent-role {
     >&2 echo "Not assuming the role in current identity / environment configuration: $aws_account_arn / $environment"
   fi
 }
-
-set +e
