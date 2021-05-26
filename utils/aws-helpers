@@ -116,8 +116,4 @@ case "${command}" in
     echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
     echo "export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
   ;;
-  *)
-    echo "Invalid command: '${command}'"
-    exit 1
-  ;;
 esac
