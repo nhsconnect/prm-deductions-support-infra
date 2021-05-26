@@ -1,8 +1,10 @@
 #!/bin/bash
 
 AWS_DEFAULT_REGION="eu-west-2"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+DOJO_IMAGE_VERSION="nhsdev/deductions-infra-dojo:a3ce7038c095298273348419769e327039009bf5"
 
-function create_build_trace_id {
+function _create_build_trace_id {
   if [ -z $GO_PIPELINE_NAME ]; then
     export BUILD_TRACE_ID=local
   else
@@ -25,6 +27,13 @@ function _get_aws_ssm_secret {
   echo $json | jq -r ".Parameter.Value"
 }
 
+function assume-ci-agent-role {
+  CURRENT_DIR=$(pwd)
+  cd "$SCRIPT_DIR"
+  eval $(dojo -image "$DOJO_IMAGE_VERSION" "./aws-helpers _assume_ci_agent_role $1")
+  cd "$CURRENT_DIR"
+}
+
 function _assume-ci-agent-role {
   unset AWS_ACCESS_KEY_ID
   unset AWS_SECRET_ACCESS_KEY
@@ -32,7 +41,7 @@ function _assume-ci-agent-role {
 
   environment=$1
   aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
-  create_build_trace_id
+  _create_build_trace_id
 
   if [[ $aws_account_arn =~ "gocd_agent-prod" && $environment = "dev" ]]; then
     >&2 echo "Assuming ci-agent-role in dev account"
@@ -50,3 +59,18 @@ function _assume-ci-agent-role {
     >&2 echo "Not assuming the role in current identity / environment configuration: $aws_account_arn / $environment"
   fi
 }
+
+
+###########
+## TASKS ##
+###########
+
+command="$1"
+case "${command}" in
+  assume-ci-agent-role)
+    _assume-ci-agent-role $2
+    echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+    echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+    echo "export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
+  ;;
+esac
