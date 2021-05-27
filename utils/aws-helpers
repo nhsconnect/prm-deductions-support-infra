@@ -15,7 +15,7 @@ function create_build_trace_id {
     git_hash=$(echo $GO_REVISION_GIT | cut -c 1-8)
     candidate_build_trace_id="$GO_PIPELINE_NAME@$GO_PIPELINE_COUNTER@$GO_STAGE_NAME@$GO_STAGE_COUNTER@$GO_JOB_NAME@$git_hash"
 
-    export BUILD_TRACE_ID=$(echo "$candidate_build_trace_id" | awk '{ print substr( $0, length($0) - 62, length($0) ) }')
+    export BUILD_TRACE_ID=$(echo "$candidate_build_trace_id" | awk '{ print substr( $0, length($0) - 62, length($0) ) }' | sed "s/^[-]*//")
   fi
 }
 
