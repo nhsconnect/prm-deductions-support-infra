@@ -112,21 +112,18 @@ function promote_docker_image {
   environment_to=${to_environment_promotion_map[$ENVIRONMENT]}
 
   >&2 echo "Promoting docker image to $environment_from to $environment_to..."
-  get_latest_commit_hash
-  IMAGE_TAG=${COMMIT_HASH}
-  IMAGE_TEMPORARY_NAME="$IMAGE_REPO_NAME:$IMAGE_TAG"
 
   assume_ci_agent_role "$environment_from"
   configure_docker_registry_uri
   IMAGE_FULL_URL="$REGISTRY_URI/$SRC_IMAGE_NAME_AND_TAG"
   echo "Pulling the image from $IMAGE_FULL_URL"
   docker pull "$IMAGE_FULL_URL"
-  docker tag "$IMAGE_FULL_URL" "$IMAGE_TEMPORARY_NAME"
+  docker tag "$IMAGE_FULL_URL" "$SRC_IMAGE_NAME_AND_TAG"
 
   assume_ci_agent_role "$environment_to"
   configure_docker_registry_uri
   IMAGE_FULL_URL="$REGISTRY_URI/$SRC_IMAGE_NAME_AND_TAG"
-  docker tag "$IMAGE_TEMPORARY_NAME" "$IMAGE_FULL_URL"
+  docker tag "$SRC_IMAGE_NAME_AND_TAG" "$IMAGE_FULL_URL"
   echo "Pushing the image to $IMAGE_FULL_URL"
   docker push "$IMAGE_FULL_URL"
 }
