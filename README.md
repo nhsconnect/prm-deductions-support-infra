@@ -6,9 +6,13 @@ The terraform state produced in this repository is pushed to a separate bucket w
 
 To deploy infrastructure, run the following commands:
 
-``` terraform init ```
+```
+terraform init
+```
 
-``` terraform apply ```
+```
+terraform apply
+```
 
 Please note the terraform state is local.
 
@@ -50,7 +54,7 @@ aws_access_key_id = <your-aws-access-key-id>
 aws_secret_access_key = <your-aws-secret-access-key>
 ```
 
-### Assume role with elevated permissions 
+### Assume role with elevated permissions
 
 #### Install `assume-role` locally:
 `brew install remind101/formulae/assume-role`
@@ -75,7 +79,7 @@ When creating the new ssm keys, please follow the agreed convention as per the d
 * all parts of the keys are lower case
 * the words are separated by dashes (`kebab case`)
 * `env` is optional
-  
+
 ### Design:
 Please follow this design to ensure the ssm keys are easy to maintain and navigate through:
 
@@ -83,3 +87,23 @@ Please follow this design to ensure the ssm keys are easy to maintain and naviga
 | -------------------| ----------------------------------------| ------------------------------------------------------|
 | **User-specified** |`/repo/<env>?/user-input/`               | `/repo/${var.environment}/user-input/db-username`     |
 | **Auto-generated** |`/repo/<env>?/output/<name-of-git-repo>/`| `/repo/output/prm-deductions-base-infra/root-zone-id` |
+
+# AWS helpers script
+
+## Release cycle and development
+
+Run
+```
+./tasks set_version
+```
+to bump patch version,
+
+or
+```
+./tasks set_version 0.X.Y
+```
+to set a new version of the script.
+
+Then make your changes and update the CHANGELOG.md description.
+
+Commit and push. A new release will be created on github.

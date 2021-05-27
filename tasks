@@ -94,6 +94,7 @@ case "${command}" in
   publish)
       # publish the just released version
       setup_github_credentials
+      export GITHUB_TOKEN=$(echo $GITHUB_CREDENTIALS | cut -d ":" -f 2)
       VERSION=$(releaser::get_last_git_tagged_version)
       releaser::prepare_github_release_bin
       GITHUB_USER=nhsconnect
