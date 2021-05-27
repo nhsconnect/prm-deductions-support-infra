@@ -4,6 +4,18 @@ set -Eeo pipefail
 
 AWS_REGION=eu-west-2
 
+RELEASER_VERSION="2.1.0"
+RELEASER_FILE="utils/releaser-${RELEASER_VERSION}"
+
+mkdir -p utils
+if [[ ! -f $RELEASER_FILE ]];then
+  wget --quiet -O $RELEASER_FILE https://github.com/kudulab/releaser/releases/download/${RELEASER_VERSION}/releaser
+fi
+source $RELEASER_FILE
+
+# we use aws-helpers to release aws-helpers
+source utils/aws-helpers
+
 function check_env {
   if [[ -z "${NHS_ENVIRONMENT}" ]]; then
     echo "Must set NHS_ENVIRONMENT"
@@ -35,6 +47,14 @@ function tf_apply {
   terraform output -json > ${NHS_ENVIRONMENT}-tf-out.json
 }
 
+function setup_github_credentials {
+  # GITHUB_CREDENTIALS should be in format of account-name:api-key
+  export GITHUB_CREDENTIALS=$(get_aws_ssm_secret "/repo/prod/user-input/external/gocd-github-api-key")
+  OLD_URL=$(git remote get-url origin)
+  NEW_URL=$(echo $OLD_URL | sed "s|https://|https://$GITHUB_CREDENTIALS@|g")
+  git remote set-url origin $NEW_URL
+}
+
 command="$1"
 case "${command}" in
   tf)
@@ -58,5 +78,37 @@ case "${command}" in
       ;;
   tf_apply)
       dojo "./tasks _tf_apply"
+      ;;
+# Release and management of lifecycle for aws-helpers script
+  set_version)
+      releaser::bump_changelog_version "$2" "$3"
+      ;;
+  verify_version)
+      releaser::verify_release_ready
+      ;;
+  release)
+      releaser::verify_release_ready
+      setup_github_credentials
+      releaser::git_tag_from_changelog
+      ;;
+  publish)
+      # publish the just released version
+      setup_github_credentials
+      VERSION=$(releaser::get_last_git_tagged_version)
+      releaser::prepare_github_release_bin
+      GITHUB_USER=nhsconnect
+      GITHUB_REPO=prm-deductions-support-infra
+      $GHRELEASE_BIN release \
+        --user $GITHUB_USER \
+        --repo $GITHUB_REPO \
+        --tag $VERSION \
+        --name $VERSION
+
+      $GHRELEASE_BIN upload \
+        --user $GITHUB_USER \
+        --repo $GITHUB_REPO \
+        --tag $VERSION \
+        --name "aws-helpers" \
+        --file utils/aws-helpers
       ;;
 esac

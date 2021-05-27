@@ -1,0 +1,29 @@
+format_version: 3
+pipelines:
+  aws-helpers:
+    group: deductions
+    label_template: "${git[:8]}"
+    materials:
+      git:
+        type: configrepo
+    stages:
+      - release:
+          clean_workspace: true
+          jobs:
+            code:
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks release
+      - publish:
+          clean_workspace: true
+          jobs:
+            code:
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks publish
