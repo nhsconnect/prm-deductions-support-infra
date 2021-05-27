@@ -88,15 +88,20 @@ function _assume_ci_agent_role {
 function promote_docker_image {
   # e.g. deductions/ehr-repo:1ab321
   SRC_IMAGE_NAME_AND_TAG=$1
+  ENVIRONMENT=$2
   if [ -z "$SRC_IMAGE_NAME_AND_TAG" ]; then
     >&2 echo "Image name and tag must be specified. e.g. deductions/ehr-repo:1ab321"
+    exit 5;
+  fi
+  if [ -z "$ENVIRONMENT" ]; then
+    >&2 echo "Environment must be specified. e.g. dev"
     exit 5;
   fi
   declare -A from_environment_promotion_map=( ["dev"]="ci" ["test"]="dev")
   declare -A to_environment_promotion_map=( ["dev"]="dev" ["test"]="ci")
 
-  environment_from=${from_environment_promotion_map[$NHS_ENVIRONMENT]}
-  environment_to=${to_environment_promotion_map[$NHS_ENVIRONMENT]}
+  environment_from=${from_environment_promotion_map[$ENVIRONMENT]}
+  environment_to=${to_environment_promotion_map[$ENVIRONMENT]}
 
   >&2 echo "Promoting docker image to $environment_from to $environment_to..."
   get_latest_commit_hash
