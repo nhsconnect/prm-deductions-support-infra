@@ -44,9 +44,13 @@ function docker_login {
   eval $(dojo -image "$DOJO_IMAGE_VERSION" "aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION")
 }
 
+function _get_aws_account_id {
+    aws sts get-caller-identity | jq -r .Account
+}
+
 function get_aws_account_id {
     AWS_ACCOUNT_ID=$(dojo -image "$DOJO_IMAGE_VERSION" "aws sts get-caller-identity | jq -r .Account")
- }
+}
 
 function configure_docker_repository_uri {
   docker_login
@@ -60,36 +64,67 @@ function configure_docker_registry_uri {
   export REGISTRY_URI=$AWS_ACCOUNT_ID.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
 }
 
-function assume_ci_agent_role {
+function assume_environment_role {
   CURRENT_DIR=$(pwd)
   cd "$SCRIPT_DIR"
-  eval $(dojo -image "$DOJO_IMAGE_VERSION" "./aws-helpers assume_ci_agent_role $1")
+  eval $(dojo -image "$DOJO_IMAGE_VERSION" "./aws-helpers assume_environment_role $1")
   cd "$CURRENT_DIR"
 }
 
-function _assume_ci_agent_role {
+function _clear_aws_env_credentials {
   unset AWS_ACCESS_KEY_ID
   unset AWS_SECRET_ACCESS_KEY
   unset AWS_SESSION_TOKEN
+  unset AWS_SECURITY_TOKEN
+}
+
+function _assume_environment_role {
+  # Agent always needs to assume repository-ci-agent role in one of the destination accounts
+  # People always need to assume RepoAdmin role in one of the destination accounts
+  # The starting role for the agent is gocd_agent-prod in the CI account
+  # The starting role for people is NHSDAdminRole in the CI account
 
   environment=$1
   aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
-  if [[ $aws_account_arn =~ "gocd_agent-prod" && $environment = "dev" ]]; then
-    >&2 echo "Assuming ci-agent-role in dev account"
-
-    desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
+  if [[ $aws_account_arn =~ "gocd_agent-prod" || $aws_account_arn =~ "repository-ci-agent" ]]; then
+    _clear_aws_env_credentials
+    if [[ $environment = "test" ]]; then
+      >&2 echo "Assuming CI agent's role in ci account to provision test environment"
+      desired_account_id=$(_get_aws_account_id)
+    else
+      >&2 echo "Assuming CI agent's role in ${environment} account"
+      desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
+    fi
     desired_role_arn="arn:aws:iam::$desired_account_id:role/repository-ci-agent"
-
-    >&2 echo "Build trace ID: $BUILD_TRACE_ID"
+    >&2 echo "Build trace ID will be set as STS session name: $BUILD_TRACE_ID"
     json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
 
+  elif [[ $aws_account_arn =~ "NHSDAdminRole" || $aws_account_arn =~ "RepoAdmin" ]]; then
+    if [[ $environment = "test" ]]; then
+      >&2 echo "Assuming RepoAdmin's role in ci account to provision test environment"
+      desired_account_id=$(_get_aws_account_id)
+    else
+      >&2 echo "Assuming RepoAdmin's role in dev account"
+      desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
+    fi
+    desired_role_arn="arn:aws:iam::$desired_account_id:role/RepoAdmin"
+
+    >&2 echo "Build trace ID will be set as STS session name: $BUILD_TRACE_ID"
+    json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
+
+  elif [[ $aws_account_arn =~ "user" ]]; then
+    # This is a human user who didn't assume admin role yet
+    >&2 echo "You must assume NHSDAdminRole in the ci account first"
+    exit 5
+  fi
+
+  if [[ ! -z $json ]]; then
     export AWS_ACCESS_KEY_ID="$(echo "$json" | jq -r .Credentials.AccessKeyId)"
     export AWS_SECRET_ACCESS_KEY="$(echo "$json" | jq -r .Credentials.SecretAccessKey)"
     export AWS_SESSION_TOKEN="$(echo "$json" | jq -r .Credentials.SessionToken)"
-  else
-    >&2 echo "Not assuming the role in current identity / environment configuration: $aws_account_arn / $environment"
+    export AWS_SECURITY_TOKEN=$AWS_SESSION_TOKEN
   fi
 }
 
@@ -113,14 +148,14 @@ function promote_docker_image {
 
   >&2 echo "Promoting docker image to $environment_from to $environment_to..."
 
-  assume_ci_agent_role "$environment_from"
+  assume_environment_role "$environment_from"
   configure_docker_registry_uri
   IMAGE_FULL_URL="$REGISTRY_URI/$SRC_IMAGE_NAME_AND_TAG"
   echo "Pulling the image from $IMAGE_FULL_URL"
   docker pull "$IMAGE_FULL_URL"
   docker tag "$IMAGE_FULL_URL" "$SRC_IMAGE_NAME_AND_TAG"
 
-  assume_ci_agent_role "$environment_to"
+  assume_environment_role "$environment_to"
   configure_docker_registry_uri
   IMAGE_FULL_URL="$REGISTRY_URI/$SRC_IMAGE_NAME_AND_TAG"
   docker tag "$SRC_IMAGE_NAME_AND_TAG" "$IMAGE_FULL_URL"
@@ -134,8 +169,8 @@ function promote_docker_image {
 
 command="$1"
 case "${command}" in
-  assume_ci_agent_role)
-    _assume_ci_agent_role $2
+  assume_environment_role)
+    _assume_environment_role $2
     echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
     echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
     echo "export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
