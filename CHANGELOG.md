@@ -1,3 +1,7 @@
+### 0.2.1 (2021-Jun-08)
+
+Fixed `assume_environment_role` to work for developers.
+
 ### 0.2.0 (2021-Jun-04)
 
 Replaced `assume_ci_agent_role` by `assume_environment_role`.
