@@ -4,3 +4,4 @@
 /utils/site-certs/
 /*.tfplan
 /utils/releaser-*
+/*tf-out.json

@@ -72,6 +72,7 @@ case "${command}" in
       dojo "./tasks _tf_plan $2"
       ;;
   _tf_apply)
+      check_env
       tf_apply
       bucket_name=$(cat ${NHS_ENVIRONMENT}-tf-out.json | jq -r ".state_store.value")
       aws s3 cp terraform.tfstate "s3://${bucket_name}/terraform.tfstate"

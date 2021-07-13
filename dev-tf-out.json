@@ -1,7 +1,0 @@
-{
-  "state_store": {
-    "sensitive": false,
-    "type": "string",
-    "value": "prm-deductions-dev-terraform-state-store"
-  }
-}
