@@ -6,6 +6,8 @@ pipelines:
     materials:
       git:
         type: configrepo
+        whitelist:
+          - utils/**/*.*
     stages:
       - release:
           clean_workspace: true
