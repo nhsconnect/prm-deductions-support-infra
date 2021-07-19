@@ -5,3 +5,4 @@
 /*.tfplan
 /utils/releaser-*
 /*tf-out.json
+/.idea

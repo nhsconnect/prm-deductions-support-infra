@@ -23,6 +23,11 @@ function check_env {
   fi
 }
 
+function print_last_tagged_version {
+  VERSION=$(releaser::get_last_git_tagged_version)
+  echo "Last tagged version of aws-helpers: ${VERSION}"
+}
+
 function tf_plan {
   check_env
 
@@ -82,6 +87,7 @@ case "${command}" in
       ;;
 # Release and management of lifecycle for aws-helpers script
   set_version)
+      print_last_tagged_version
       releaser::bump_changelog_version "$2" "$3"
       ;;
   verify_version)
@@ -90,6 +96,7 @@ case "${command}" in
   release)
       releaser::verify_release_ready
       setup_github_credentials
+      print_last_tagged_version
       releaser::git_tag_from_changelog
       ;;
   publish)
@@ -97,6 +104,7 @@ case "${command}" in
       setup_github_credentials
       export GITHUB_TOKEN=$(echo $GITHUB_CREDENTIALS | cut -d ":" -f 2)
       VERSION=$(releaser::get_last_git_tagged_version)
+      print_last_tagged_version
       releaser::prepare_github_release_bin
       GITHUB_USER=nhsconnect
       GITHUB_REPO=prm-deductions-support-infra

@@ -1,3 +1,11 @@
+### 0.2.6 (2021-Jul-19)
+
+Logged the latest released version of the helpers in tasks
+
+### 0.2.5 (2021-Jul-16)
+### 0.2.4 (2021-Jul-16)
+### 0.2.3 (2021-Jul-16)
+
 ### 0.2.2 (2021-Jul-13)
 
 Adopted promote-docker-image script to work in pre-prod
