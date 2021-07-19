@@ -21,6 +21,14 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state" {
     }
   }
 
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
   tags = {
      Name = "Terraform states of deductions infrastructure"
      CreatedBy = "prm-deductions-support-infra"
@@ -43,6 +51,14 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state-store" {
 
     noncurrent_version_expiration {
       days = 360
+    }
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
     }
   }
 

@@ -1,3 +1,8 @@
+### 0.2.2 (2021-Jul-13)
+
+Adopted promote-docker-image script to work in pre-prod
+Fixed logs
+
 ### 0.2.1 (2021-Jun-08)
 
 Fixed `assume_environment_role` to work for developers.

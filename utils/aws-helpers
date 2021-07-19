@@ -106,7 +106,7 @@ function _assume_environment_role {
       >&2 echo "Assuming RepoAdmin's role in ci account to provision test environment"
       desired_account_id=$(_get_aws_account_id)
     else
-      >&2 echo "Assuming RepoAdmin's role in dev account"
+      echo >&2 "Assuming RepoAdmin's role in ${environment} account"
       desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
     fi
     desired_role_arn="arn:aws:iam::$desired_account_id:role/RepoAdmin"
@@ -140,13 +140,13 @@ function promote_docker_image {
     >&2 echo "Environment must be specified. e.g. dev"
     exit 5;
   fi
-  declare -A from_environment_promotion_map=( ["dev"]="ci" ["test"]="dev")
-  declare -A to_environment_promotion_map=( ["dev"]="dev" ["test"]="ci")
+  declare -A from_environment_promotion_map=(["dev"]="ci" ["test"]="dev" ["pre-prod"]="ci")
+  declare -A to_environment_promotion_map=(["dev"]="dev" ["test"]="ci" ["pre-prod"]="pre-prod")
 
   environment_from=${from_environment_promotion_map[$ENVIRONMENT]}
   environment_to=${to_environment_promotion_map[$ENVIRONMENT]}
 
-  >&2 echo "Promoting docker image to $environment_from to $environment_to..."
+  echo >&2 "Promoting docker image from $environment_from to $environment_to..."
 
   assume_environment_role "$environment_from"
   configure_docker_registry_uri
