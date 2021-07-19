@@ -1,3 +1,8 @@
+### 0.2.3 (2021-Jul-16)
+
+Security changes: encrypted terraform state s3 bucket
+Fixed prefixes from test env
+
 ### 0.2.2 (2021-Jul-13)
 
 Adopted promote-docker-image script to work in pre-prod
