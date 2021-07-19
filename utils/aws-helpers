@@ -3,6 +3,15 @@
 AWS_DEFAULT_REGION="eu-west-2"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 DOJO_IMAGE_VERSION="nhsdev/deductions-infra-dojo:a3ce7038c095298273348419769e327039009bf5"
+RELEASER_VERSION="2.1.0"
+RELEASER_FILE="utils/releaser-${RELEASER_VERSION}"
+
+mkdir -p utils
+if [[ ! -f $RELEASER_FILE ]];then
+  wget --quiet -O $RELEASER_FILE https://github.com/kudulab/releaser/releases/download/${RELEASER_VERSION}/releaser
+fi
+source $RELEASER_FILE
+AWS_HELPERS_VERSION=$(releaser::get_last_git_tagged_version)
 
 function get_latest_commit_hash {
   export COMMIT_HASH=$(git rev-parse HEAD | cut -c 1-7)
@@ -20,6 +29,7 @@ function create_build_trace_id {
 }
 
 function get_aws_ssm_secret {
+  echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   secret_id=$1
   json=$(dojo -image "$DOJO_IMAGE_VERSION" "aws ssm get-parameter --with-decryption --region eu-west-2 --name $secret_id")
   if [ $? != 0 ]; then
@@ -30,6 +40,7 @@ function get_aws_ssm_secret {
 }
 
 function _get_aws_ssm_secret {
+  echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   secret_id=$1
   json=$(aws ssm get-parameter --with-decryption --region "eu-west-2" --name $secret_id)
   if [ $? != 0 ]; then
@@ -65,6 +76,7 @@ function configure_docker_registry_uri {
 }
 
 function assume_environment_role {
+  echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   CURRENT_DIR=$(pwd)
   cd "$SCRIPT_DIR"
   eval $(dojo -image "$DOJO_IMAGE_VERSION" "./aws-helpers assume_environment_role $1")
@@ -83,7 +95,7 @@ function _assume_environment_role {
   # People always need to assume RepoAdmin role in one of the destination accounts
   # The starting role for the agent is gocd_agent-prod in the CI account
   # The starting role for people is NHSDAdminRole in the CI account
-
+  echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   environment=$1
   aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
