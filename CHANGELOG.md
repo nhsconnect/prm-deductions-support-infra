@@ -1,6 +1,6 @@
 ### 0.2.7 (2021-Jul-26)
 
-Adopted new pre-prod roles.
+Adopted new pre-prod roles
 
 ### 0.2.6 (2021-Jul-19)
 
