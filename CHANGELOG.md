@@ -1,3 +1,7 @@
+### 0.2.7 (2021-Jul-26)
+
+Adopted new pre-prod roles.
+
 ### 0.2.6 (2021-Jul-19)
 
 Logged the latest released version of the helpers in tasks

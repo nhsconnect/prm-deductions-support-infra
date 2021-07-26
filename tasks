@@ -63,6 +63,7 @@ case "${command}" in
       ;;
   _tf_plan)
       check_env
+      _assume_environment_role ${NHS_ENVIRONMENT} true
       if [ -f ${NHS_ENVIRONMENT}-tf-out.json ]; then
         bucket_name=$(cat ${NHS_ENVIRONMENT}-tf-out.json | jq -r ".state_store.value")
         aws s3 cp "s3://${bucket_name}/terraform.tfstate" terraform.tfstate
@@ -74,6 +75,7 @@ case "${command}" in
       ;;
   _tf_apply)
       check_env
+      _assume_environment_role ${NHS_ENVIRONMENT} true
       tf_apply
       bucket_name=$(cat ${NHS_ENVIRONMENT}-tf-out.json | jq -r ".state_store.value")
       aws s3 cp terraform.tfstate "s3://${bucket_name}/terraform.tfstate"
