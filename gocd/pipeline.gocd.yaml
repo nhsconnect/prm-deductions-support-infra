@@ -7,7 +7,7 @@ pipelines:
       git:
         type: configrepo
         whitelist:
-          - utils/**/*.*
+          - utils/aws-helpers
     stages:
       - release:
           clean_workspace: true

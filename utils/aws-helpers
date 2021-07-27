@@ -94,7 +94,7 @@ function _assume_environment_role {
   # The starting role for people is NHSDAdminRole in the CI account
   echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   environment=$1
-  is_boostrap_admin=$3
+  is_boostrap_admin=$2
   aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
@@ -136,7 +136,7 @@ function assume_role_for_user {
   aws_account_arn=$2
   is_boostrap_admin=$3
   if [[ $aws_account_arn =~ "NHSDAdminRole" && $environment =~ "prod" ]]; then
-    if $is_boostrap_admin ; then
+    if [[ $is_boostrap_admin = "true" ]]; then
       ROLE_NAME="BootstrapAdmin"
     else
       ROLE_NAME="RepoDeveloper"

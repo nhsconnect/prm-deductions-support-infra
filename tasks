@@ -12,7 +12,6 @@ if [[ ! -f $RELEASER_FILE ]];then
   wget --quiet -O $RELEASER_FILE https://github.com/kudulab/releaser/releases/download/${RELEASER_VERSION}/releaser
 fi
 source $RELEASER_FILE
-AWS_HELPERS_VERSION=$(releaser::get_last_git_tagged_version)
 
 # we use aws-helpers to release aws-helpers
 source utils/aws-helpers
@@ -85,7 +84,6 @@ case "${command}" in
       ;;
 # Release and management of lifecycle for aws-helpers script
   set_version)
-      echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
       releaser::bump_changelog_version "$2" "$3"
       ;;
   verify_version)
@@ -94,12 +92,10 @@ case "${command}" in
   release)
       releaser::verify_release_ready
       setup_github_credentials
-      echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
       releaser::git_tag_from_changelog
       ;;
   publish)
       # publish the just released version
-      echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
       setup_github_credentials
       export GITHUB_TOKEN=$(echo $GITHUB_CREDENTIALS | cut -d ":" -f 2)
       releaser::prepare_github_release_bin
