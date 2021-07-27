@@ -29,7 +29,6 @@ function create_build_trace_id {
 }
 
 function get_aws_ssm_secret {
-  echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   secret_id=$1
   json=$(dojo -image "$DOJO_IMAGE_VERSION" "aws ssm get-parameter --with-decryption --region eu-west-2 --name $secret_id")
   if [ $? != 0 ]; then
@@ -75,7 +74,6 @@ function configure_docker_registry_uri {
 }
 
 function assume_environment_role {
-  echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   CURRENT_DIR=$(pwd)
   cd "$SCRIPT_DIR"
   eval $(dojo -image "$DOJO_IMAGE_VERSION" "./aws-helpers assume_environment_role $1")
@@ -131,6 +129,7 @@ function assume_role_for_ci_agent {
     desired_role_arn="arn:aws:iam::$desired_account_id:role/repository-ci-agent"
     >&2 echo "Build trace ID will be set as STS session name: $BUILD_TRACE_ID"
     json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
+}
 
 function assume_role_for_user {
   environment=$1
