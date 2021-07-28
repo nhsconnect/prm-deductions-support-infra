@@ -12,6 +12,7 @@ if [[ ! -f $RELEASER_FILE ]];then
   wget --quiet -O $RELEASER_FILE https://github.com/kudulab/releaser/releases/download/${RELEASER_VERSION}/releaser
 fi
 source $RELEASER_FILE
+AWS_HELPERS_VERSION=$(releaser::get_last_git_tagged_version)
 
 # we use aws-helpers to release aws-helpers
 source utils/aws-helpers
@@ -99,6 +100,7 @@ case "${command}" in
       setup_github_credentials
       export GITHUB_TOKEN=$(echo $GITHUB_CREDENTIALS | cut -d ":" -f 2)
       releaser::prepare_github_release_bin
+      echo releasing version $AWS_HELPERS_VERSION aws-helpers
       GITHUB_USER=nhsconnect
       GITHUB_REPO=prm-deductions-support-infra
       $GHRELEASE_BIN release \
