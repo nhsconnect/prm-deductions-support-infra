@@ -1,10 +1,7 @@
-### 0.2.8 (2021-Jul-27)
-
-Fixed get_ssm_param script.
-
 ### 0.2.7 (2021-Jul-26)
 
 Adopted new pre-prod roles
+Fixed get_ssm_param script.
 
 ### 0.2.6 (2021-Jul-19)
 

@@ -3,15 +3,6 @@
 AWS_DEFAULT_REGION="eu-west-2"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 DOJO_IMAGE_VERSION="nhsdev/deductions-infra-dojo:a3ce7038c095298273348419769e327039009bf5"
-RELEASER_VERSION="2.1.0"
-RELEASER_FILE="utils/releaser-${RELEASER_VERSION}"
-
-mkdir -p utils
-if [[ ! -f $RELEASER_FILE ]];then
-  wget --quiet -O $RELEASER_FILE https://github.com/kudulab/releaser/releases/download/${RELEASER_VERSION}/releaser
-fi
-source $RELEASER_FILE
-AWS_HELPERS_VERSION=$(releaser::get_last_git_tagged_version)
 
 function get_latest_commit_hash {
   export COMMIT_HASH=$(git rev-parse HEAD | cut -c 1-7)
@@ -92,7 +83,6 @@ function _assume_environment_role {
   # People always need to assume RepoAdmin role in one of the destination accounts
   # The starting role for the agent is gocd_agent-prod in the CI account
   # The starting role for people is NHSDAdminRole in the CI account
-  echo "Last tagged version of aws-helpers: ${AWS_HELPERS_VERSION}"
   environment=$1
   is_boostrap_admin=$2
   aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
@@ -150,10 +140,8 @@ function assume_role_for_user {
     else
       echo >&2 "Assuming ${ROLE_NAME}'s role in ${environment} account"
       desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
-      echo $desired_account_id
     fi
     desired_role_arn="arn:aws:iam::$desired_account_id:role/${ROLE_NAME}"
-    echo $desired_role_arn
     >&2 echo "Build trace ID will be set as STS session name: $BUILD_TRACE_ID"
     json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
 }
