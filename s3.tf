@@ -35,6 +35,25 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state" {
   }
 }
 
+resource "aws_s3_bucket_policy" "terraform-state" {
+  bucket = aws_s3_bucket.prm-deductions-terraform-state.id
+  policy = jsonencode({
+    "Statement": [
+      {
+        Effect: "Deny",
+        Principal: "*",
+        Action: "s3:*",
+        Resource: "${aws_s3_bucket.prm-deductions-terraform-state.arn}/*",
+        Condition: {
+          Bool: {
+            "aws:SecureTransport": "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
 # S3 bucket to hold terraform state produced in this repo
 resource "aws_s3_bucket" "prm-deductions-terraform-state-store" {
   bucket = "prm-deductions-${local.prefix}terraform-state-store"
@@ -66,6 +85,25 @@ resource "aws_s3_bucket" "prm-deductions-terraform-state-store" {
      Name = "Terraform state of the prm-deductions-support-infra"
      CreatedBy = "prm-deductions-support-infra"
   }
+}
+
+resource "aws_s3_bucket_policy" "terraform-state-store" {
+  bucket = aws_s3_bucket.prm-deductions-terraform-state-store.id
+  policy = jsonencode({
+    "Statement": [
+      {
+        Effect: "Deny",
+        Principal: "*",
+        Action: "s3:*",
+        Resource: "${aws_s3_bucket.prm-deductions-terraform-state-store.arn}/*",
+        Condition: {
+          Bool: {
+            "aws:SecureTransport": "false"
+          }
+        }
+      }
+    ]
+  })
 }
 
 output "state_store" {
