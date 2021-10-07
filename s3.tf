@@ -105,7 +105,3 @@ resource "aws_s3_bucket_policy" "terraform-state-store" {
     ]
   })
 }
-
-output "state_store" {
-  value = "prm-deductions-${local.prefix}terraform-state-store"
-}

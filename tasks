@@ -48,6 +48,11 @@ function tf_apply {
   terraform output -json > ${NHS_ENVIRONMENT}-tf-out.json
 }
 
+function configure_state_bucket_name {
+  [ $NHS_ENVIRONMENT == "ci" ] &&  bucket_env_infix=""  || bucket_env_infix="$NHS_ENVIRONMENT-"
+  export STATE_BUCKET_NAME="prm-deductions-${bucket_env_infix}terraform-state-store"
+}
+
 function setup_github_credentials {
   # GITHUB_CREDENTIALS should be in format of account-name:api-key
   export GITHUB_CREDENTIALS=$(get_aws_ssm_secret "/repo/prod/user-input/external/gocd-github-api-key")
@@ -64,10 +69,8 @@ case "${command}" in
   _tf_plan)
       check_env
       _assume_environment_role ${NHS_ENVIRONMENT} true
-      if [ -f ${NHS_ENVIRONMENT}-tf-out.json ]; then
-        bucket_name=$(cat ${NHS_ENVIRONMENT}-tf-out.json | jq -r ".state_store.value")
-        aws s3 cp "s3://${bucket_name}/terraform.tfstate" terraform.tfstate
-      fi
+      configure_state_bucket_name
+      aws s3 cp "s3://${STATE_BUCKET_NAME}/terraform.tfstate" terraform.tfstate
       tf_plan "$2"
       ;;
   tf_plan)
@@ -77,8 +80,8 @@ case "${command}" in
       check_env
       _assume_environment_role ${NHS_ENVIRONMENT} true
       tf_apply
-      bucket_name=$(cat ${NHS_ENVIRONMENT}-tf-out.json | jq -r ".state_store.value")
-      aws s3 cp terraform.tfstate "s3://${bucket_name}/terraform.tfstate"
+      configure_state_bucket_name
+      aws s3 cp terraform.tfstate "s3://${STATE_BUCKET_NAME}/terraform.tfstate"
       ;;
   tf_apply)
       dojo "./tasks _tf_apply"
