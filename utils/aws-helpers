@@ -82,19 +82,19 @@ function _assume_environment_role {
   # Agent always needs to assume repository-ci-agent role in one of the destination accounts
   # People always need to assume RepoAdmin role in one of the destination accounts
   # The starting role for the agent is gocd_agent-prod in the CI account
-  # The starting role for people is NHSDAdminRole in the CI account
+  # The starting role for people is their personal user in the nhsd-identities account
   environment=$1
   is_boostrap_admin=$2
-  aws_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
+  current_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
-  if [[ $aws_account_arn =~ "gocd_agent-prod" || $aws_account_arn =~ "repository-ci-agent" ]]; then
+  if [[ $current_account_arn =~ "gocd_agent-prod" || $current_account_arn =~ "repository-ci-agent" ]]; then
     assume_role_for_ci_agent "${environment}"
-  elif [[ $aws_account_arn =~ "NHSDAdminRole" || $aws_account_arn =~ "RepoAdmin" || $aws_account_arn =~ "BoostrapAdmin" || $aws_account_arn =~ "RepoDeveloper" ]]; then
-     assume_role_for_user "${environment}" "${aws_account_arn}" "${is_boostrap_admin}"
-  elif [[ $aws_account_arn =~ "user" ]]; then
-    # This is a human user who didn't assume admin role yet
-    >&2 echo "You must assume NHSDAdminRole in the ci account first"
+  elif [[ $current_account_arn =~ "user" || $current_account_arn =~ "RepoAdmin" || $current_account_arn =~ "BoostrapAdmin" || $current_account_arn =~ "RepoDeveloper" ]]; then
+     assume_role_for_user "${environment}" "${current_account_arn}" "${is_boostrap_admin}"
+  elif [[ $current_account_arn =~ "NHSDAdminRole" ]]; then
+    # This is a human user who has already assumed admin role
+    >&2 echo "You do not need to assume NHSDAdminRole in the ci account first, assume role direct from your user identity"
     exit 5
   fi
 
@@ -118,15 +118,15 @@ function assume_role_for_ci_agent {
 
 function assume_role_for_user {
   environment=$1
-  aws_account_arn=$2
+  current_account_arn=$2
   is_boostrap_admin=$3
-  if [[ $aws_account_arn =~ "NHSDAdminRole" && $environment =~ "prod" ]]; then
+  if [[ $current_account_arn =~ "user" && $environment =~ "prod" ]]; then
     if [[ $is_boostrap_admin = "true" ]]; then
       ROLE_NAME="BootstrapAdmin"
     else
       ROLE_NAME="RepoDeveloper"
     fi
-  elif [[ $aws_account_arn =~ "RepoAdmin" || $aws_account_arn =~ "NHSDAdminRole" ]]; then
+  elif [[ $current_account_arn =~ "RepoAdmin" || $current_account_arn =~ "user" ]]; then
     ROLE_NAME="RepoAdmin"
   fi
   echo >&2 "Assuming ${ROLE_NAME}'s role in ${environment} account"
