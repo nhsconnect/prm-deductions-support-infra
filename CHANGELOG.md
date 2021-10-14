@@ -1,3 +1,9 @@
+### 0.2.11 (2021-Oct-14)
+
+Changed to assume roles direct from user account
+
+Fixed typo bug on bootstrap admin assume role 
+
 ### 0.2.10 (2021-Oct-06)
 
 ### 0.2.9 (2021-Jul-28)
