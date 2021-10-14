@@ -84,14 +84,14 @@ function _assume_environment_role {
   # The starting role for the agent is gocd_agent-prod in the CI account
   # The starting role for people is their personal user in the nhsd-identities account
   environment=$1
-  is_boostrap_admin=$2
+  is_bootstrap_admin=$2
   current_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
   if [[ $current_account_arn =~ "gocd_agent-prod" || $current_account_arn =~ "repository-ci-agent" ]]; then
     assume_role_for_ci_agent "${environment}"
-  elif [[ $current_account_arn =~ "user" || $current_account_arn =~ "RepoAdmin" || $current_account_arn =~ "BoostrapAdmin" || $current_account_arn =~ "RepoDeveloper" ]]; then
-     assume_role_for_user "${environment}" "${current_account_arn}" "${is_boostrap_admin}"
+  elif [[ $current_account_arn =~ "user" || $current_account_arn =~ "RepoAdmin" || $current_account_arn =~ "BootstrapAdmin" || $current_account_arn =~ "RepoDeveloper" ]]; then
+     assume_role_for_user "${environment}" "${current_account_arn}" "${is_bootstrap_admin}"
   elif [[ $current_account_arn =~ "NHSDAdminRole" ]]; then
     # This is a human user who has already assumed admin role
     >&2 echo "You do not need to assume NHSDAdminRole in the ci account first, assume role direct from your user identity"
@@ -119,9 +119,9 @@ function assume_role_for_ci_agent {
 function assume_role_for_user {
   environment=$1
   current_account_arn=$2
-  is_boostrap_admin=$3
+  is_bootstrap_admin=$3
   if [[ $current_account_arn =~ "user" && $environment =~ "prod" ]]; then
-    if [[ $is_boostrap_admin = "true" ]]; then
+    if [[ $is_bootstrap_admin = "true" ]]; then
       ROLE_NAME="BootstrapAdmin"
     else
       ROLE_NAME="RepoDeveloper"
