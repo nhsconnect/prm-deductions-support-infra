@@ -6,16 +6,16 @@ pipelines:
     materials:
       git:
         type: configrepo
-        whitelist:
+        includes:
           - utils/aws-helpers
-          - test/**/*.*
+          - 'test/**/*.*'
     stages:
       - test:
-        tasks:
-          - exec:
-              command: ./tasks
-              arguments:
-                - test
+          tasks:
+            - exec:
+                command: ./tasks
+                arguments:
+                  - test
       - release:
           clean_workspace: true
           approval: manual
