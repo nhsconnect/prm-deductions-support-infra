@@ -5,5 +5,10 @@
 /*.tfplan
 /utils/releaser-*
 /*tf-out.json
-/.idea
+
 /tests/test_helper/
+/calls.txt
+
+/.idea
+.vscode/
+

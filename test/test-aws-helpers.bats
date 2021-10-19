@@ -10,12 +10,7 @@ setup() {
     assert_output 'bob'
 }
 
-@test 'simple failing test' {
-    run echo 'sue'
-    assert_failure
-}
-
-@test 'can run _assume_environment_role even if aws not found' {
+@test 'can run _assume_environment_role but aws will not be found' {
     source utils/aws-helpers
     run _assume_environment_role
     assert_output --partial "aws: command not found"
