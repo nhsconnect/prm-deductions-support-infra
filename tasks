@@ -86,6 +86,10 @@ case "${command}" in
   tf_apply)
       dojo "./tasks _tf_apply"
       ;;
+# bats-based script testing
+  test)
+      docker run -it --rm -v $(pwd):/work --workdir /work bats/bats test
+      ;;
 # Release and management of lifecycle for aws-helpers script
   set_version)
       releaser::bump_changelog_version "$2" "$3"

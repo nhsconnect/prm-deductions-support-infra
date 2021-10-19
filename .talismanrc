@@ -1,0 +1,9 @@
+fileignoreconfig:
+- filename: test/helpers/bats-assert
+  checksum: f2e4da4dfc22981641fe21b13c8cef755785845c1431427b3312ca6558251a21
+- filename: test/helpers/bats-mock
+  checksum: de4027c10c493fc41d4d349f4ddca23735184cd19503b22aad0ed88d67e44974
+- filename: test/helpers/bats-support
+  checksum: 2076897e3d8d1a27b5d649ebdf9637ea9de70464a8c45346e9054689157c1db3
+- filename: tasks
+  checksum: 2fc7ca55276ae9c04ffd5d3a0e6037e320b9666f1f01e1f0633aaa419a2cb510
