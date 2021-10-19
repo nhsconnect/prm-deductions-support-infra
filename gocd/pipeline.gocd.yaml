@@ -8,9 +8,17 @@ pipelines:
         type: configrepo
         whitelist:
           - utils/aws-helpers
+          - test/**/*.*
     stages:
+      - test:
+        tasks:
+          - exec:
+              command: ./tasks
+              arguments:
+                - test
       - release:
           clean_workspace: true
+          approval: manual
           jobs:
             code:
               tasks:
