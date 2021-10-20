@@ -44,9 +44,7 @@ spy_on() {
 }
 
 @test '_assume_environment_role uses ci agent roles if current identity is the ci account gocd agent' {
-
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/gocd_agent-prod/blah-session'
-
     spy_on 'assume_role_for_ci_agent'
 
     run _assume_environment_role
@@ -55,9 +53,7 @@ spy_on() {
 }
 
 @test '_assume_environment_role uses ci agent roles if current identity is  the environment account agent role' {
-
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/repository-ci-agent/blah-session'
-
     spy_on 'assume_role_for_ci_agent'
 
     run _assume_environment_role
@@ -65,8 +61,7 @@ spy_on() {
     assert was_called 'assume_role_for_ci_agent'
 }
 
-@test '_assume_environment_role prompts users to assume RepoAdmin directly in dev account' {
-
+@test '_assume_environment_role prompts users to assume broad-access RepoAdmin role directly in dev' {
     stub_current_identity 'arn:aws:iam::blah-account:user/jo.bloggs1'
 
     run _assume_environment_role dev
@@ -75,8 +70,7 @@ spy_on() {
     refute_output --partial 'Assuming RepoAdmin'
 }
 
-@test '_assume_environment_role prompts users to assume RepoAdmin directly in test account' {
-
+@test '_assume_environment_role prompts users to assume broad-access RepoAdmin role directly in test account' {
     stub_current_identity 'arn:aws:iam::blah-account:user/ham.solo1'
 
     run _assume_environment_role test
@@ -85,8 +79,7 @@ spy_on() {
     refute_output --partial 'Assuming'
 }
 
-@test '_assume_environment_role prompts users to assume RepoDeveloper directly in pre-prod account' {
-
+@test '_assume_environment_role prompts users to assume strict RepoDeveloper role directly in pre-prod' {
     stub_current_identity 'arn:aws:iam::blah-account:user/jack.frost1'
 
     run _assume_environment_role pre-prod
@@ -95,8 +88,7 @@ spy_on() {
     refute_output --partial 'Assuming'
 }
 
-@test '_assume_environment_role prompts users to assume RepoDeveloper directly in prod account' {
-
+@test '_assume_environment_role prompts users to assume strict RepoDeveloper role directly in prod' {
     stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
 
     run _assume_environment_role prod
@@ -105,8 +97,7 @@ spy_on() {
     refute_output --partial 'Assuming'
 }
 
-@test '_assume_environment_role prompts users to assume BootstrapAdmin directly in pre-prod account' {
-
+@test '_assume_environment_role prompts users to assume strict BootstrapAdmin role directly in pre-prod' {
     stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
 
     is_bootstrap_admin=true
@@ -116,8 +107,7 @@ spy_on() {
     refute_output --partial 'Assuming'
 }
 
-@test '_assume_environment_role prompts users to assume BootstrapAdmin directly in prod account' {
-
+@test '_assume_environment_role prompts users to assume strict BootstrapAdmin role directly in prod' {
     stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
 
     is_bootstrap_admin=true
@@ -128,7 +118,6 @@ spy_on() {
 }
 
 @test '_assume_environment_role uses user roles if current identity is RepoAdmin role' {
-
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoAdmin/blah-session'
 
     spy_on 'assume_role_for_user'
@@ -139,9 +128,7 @@ spy_on() {
 }
 
 @test '_assume_environment_role uses user roles if current identity is BootstrapAdmin role' {
-
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/BootstrapAdmin/blah-session'
-
     spy_on 'assume_role_for_user'
 
     run _assume_environment_role
@@ -150,9 +137,7 @@ spy_on() {
 }
 
 @test '_assume_environment_role uses user roles if current identity is RepoDeveloper role' {
-
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoDeveloper/blah-session'
-
     spy_on 'assume_role_for_user'
 
     run _assume_environment_role
@@ -160,9 +145,7 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
-
 @test '_assume_environment_role displays helpful message if attempting to use from NHSDAdminRole' {
-
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/NHSDAdminRole/blah-session'
 
     run _assume_environment_role
