@@ -98,7 +98,9 @@ function _assume_environment_role {
      assume_role_for_user "${environment}" "${current_account_arn}" "${is_bootstrap_admin}"
   elif [[ $current_account_arn =~ "NHSDAdminRole" ]]; then
     # This is a human user who has already assumed admin role
-    >&2 echo "You do not need to assume NHSDAdminRole in the ci account first, assume role direct from your user identity"
+    >&2 echo "You are using NHSDAdminRole which is now deprecated for general use. Clear assumed role with:"
+    >&2 echo "  unset AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID AWS_SECURITY_TOKEN"
+    >&2 echo "You should assume role direct from your user identity."
     exit $EXIT_CODE_DONT_USE_NHSDADMINROLE
   fi
 
