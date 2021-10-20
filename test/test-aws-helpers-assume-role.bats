@@ -145,7 +145,7 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
-@test '_assume_environment_role displays helpful message if attempting to use from NHSDAdminRole' {
+@test '_assume_environment_role warns users off using NHSDAdminRole if they have assumed it' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/NHSDAdminRole/blah-session'
 
     run _assume_environment_role
