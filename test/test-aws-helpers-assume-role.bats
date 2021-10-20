@@ -43,7 +43,9 @@ spy_on() {
     eval "$fn_name() { log_call '$fn_name'; }"
 }
 
-@test '_assume_environment_role uses ci agent roles if current identity is the ci account gocd agent' {
+it=_assume_environment_role
+
+@test '$it uses ci agent roles if current identity is the ci account gocd agent' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/gocd_agent-prod/blah-session'
     spy_on 'assume_role_for_ci_agent'
 
@@ -52,7 +54,7 @@ spy_on() {
     assert was_called 'assume_role_for_ci_agent'
 }
 
-@test '_assume_environment_role uses ci agent roles if current identity is  the environment account agent role' {
+@test '$it uses ci agent roles if current identity is  the environment account agent role' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/repository-ci-agent/blah-session'
     spy_on 'assume_role_for_ci_agent'
 
@@ -61,43 +63,49 @@ spy_on() {
     assert was_called 'assume_role_for_ci_agent'
 }
 
-@test '_assume_environment_role prompts users to assume broad-access RepoAdmin role directly in dev' {
+@test '$it prompts users to assume broad-access RepoAdmin role directly in dev and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:user/jo.bloggs1'
+
+    exit_code_users_should_assume_role_first=7
 
     run _assume_environment_role dev
 
     assert_output --partial 'Please assume RepoAdmin in dev directly from your shell'
     refute_output --partial 'Assuming RepoAdmin'
+    assert_equal $status $exit_code_users_should_assume_role_first
 }
 
-@test '_assume_environment_role prompts users to assume broad-access RepoAdmin role directly in test account' {
+@test '$it prompts users to assume broad-access RepoAdmin role directly in test account and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:user/ham.solo1'
 
     run _assume_environment_role test
 
     assert_output --partial 'Please assume RepoAdmin in test directly from your shell'
     refute_output --partial 'Assuming'
+    assert_failure
 }
 
-@test '_assume_environment_role prompts users to assume strict RepoDeveloper role directly in pre-prod' {
+@test '$it prompts users to assume strict RepoDeveloper role directly in pre-prod and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:user/jack.frost1'
 
     run _assume_environment_role pre-prod
 
     assert_output --partial 'Please assume RepoDeveloper in pre-prod directly from your shell'
     refute_output --partial 'Assuming'
+    assert_failure
 }
 
-@test '_assume_environment_role prompts users to assume strict RepoDeveloper role directly in prod' {
+@test '$it prompts users to assume strict RepoDeveloper role directly in prod and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
 
     run _assume_environment_role prod
 
     assert_output --partial 'Please assume RepoDeveloper in prod directly from your shell'
     refute_output --partial 'Assuming'
+    assert_failure
 }
 
-@test '_assume_environment_role prompts users to assume strict BootstrapAdmin role directly in pre-prod' {
+@test '$it prompts users to assume strict BootstrapAdmin role directly in pre-prod and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
 
     is_bootstrap_admin=true
@@ -105,9 +113,10 @@ spy_on() {
 
     assert_output --partial 'Please assume BootstrapAdmin in pre-prod directly from your shell'
     refute_output --partial 'Assuming'
+    assert_failure
 }
 
-@test '_assume_environment_role prompts users to assume strict BootstrapAdmin role directly in prod' {
+@test '$it prompts users to assume strict BootstrapAdmin role directly in prod and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
 
     is_bootstrap_admin=true
@@ -115,9 +124,10 @@ spy_on() {
 
     assert_output --partial 'Please assume BootstrapAdmin in prod directly from your shell'
     refute_output --partial 'Assuming'
+    assert_failure
 }
 
-@test '_assume_environment_role uses user roles if current identity is RepoAdmin role' {
+@test '$it uses user roles if they have already assumed env RepoAdmin role' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoAdmin/blah-session'
 
     spy_on 'assume_role_for_user'
@@ -127,7 +137,7 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
-@test '_assume_environment_role uses user roles if current identity is BootstrapAdmin role' {
+@test '$it uses user roles if they have already assumed env BootstrapAdmin role' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/BootstrapAdmin/blah-session'
     spy_on 'assume_role_for_user'
 
@@ -136,7 +146,7 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
-@test '_assume_environment_role uses user roles if current identity is RepoDeveloper role' {
+@test '$it uses user roles if they have already assumed env RepoDeveloper role' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoDeveloper/blah-session'
     spy_on 'assume_role_for_user'
 
@@ -145,10 +155,12 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
-@test '_assume_environment_role warns users off using NHSDAdminRole if they have assumed it' {
+@test '$it warns users off using NHSDAdminRole if they have assumed it and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/NHSDAdminRole/blah-session'
+    exit_code_dont_use_nhsdadminrole=6
 
     run _assume_environment_role
 
     assert_output --partial 'assume role direct from your user identity'
+    assert_equal $status $exit_code_dont_use_nhsdadminrole
 }

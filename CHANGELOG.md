@@ -1,3 +1,5 @@
+### 0.2.13 (2021-Oct-20)
+
 ### 0.2.12 (2021-Oct-20)
 
 Now prompting users to assume initial environment role directly
