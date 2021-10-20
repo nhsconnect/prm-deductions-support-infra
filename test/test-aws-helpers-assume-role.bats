@@ -70,3 +70,7 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
+@test 'force fail' {
+    run echo bob
+    assert_output 'not bob'
+}
