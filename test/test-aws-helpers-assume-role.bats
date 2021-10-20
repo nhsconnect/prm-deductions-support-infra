@@ -9,7 +9,7 @@ setup() {
     source utils/aws-helpers
 }
 
-stub_role_lookup() {
+stub_current_identity() {
     role=$1
 
     aws() {
@@ -29,7 +29,13 @@ log_call() {
 
 was_called() {
     required_call=$1
-    grep $required_call calls.txt
+    if grep $required_call calls.txt 2> /dev/null; then
+        echo "$required_call was called"
+        return 0
+    else
+        echo "$required_call was not called"
+        return 1
+    fi
 }
 
 spy_on() {
@@ -37,9 +43,9 @@ spy_on() {
     eval "$fn_name() { log_call '$fn_name'; }"
 }
 
-@test '_assume_environment_role uses ci agent roles if current identity is ci account gocd agent' {
+@test '_assume_environment_role uses ci agent roles if current identity is the ci account gocd agent' {
 
-    stub_role_lookup 'arn:aws:iam::1234567890:assumed-role/gocd_agent-prod/12345'
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/gocd_agent-prod/blah-session'
 
     spy_on 'assume_role_for_ci_agent'
 
@@ -48,9 +54,9 @@ spy_on() {
     assert was_called 'assume_role_for_ci_agent'
 }
 
-@test '_assume_environment_role uses ci agent roles if current identity is environment account agent role' {
+@test '_assume_environment_role uses ci agent roles if current identity is  the environment account agent role' {
 
-    stub_role_lookup 'arn:aws:iam::1234567890:assumed-role/repository-ci-agent/12345'
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/repository-ci-agent/blah-session'
 
     spy_on 'assume_role_for_ci_agent'
 
@@ -61,7 +67,7 @@ spy_on() {
 
 @test '_assume_environment_role uses user roles if current identity is a user' {
 
-    stub_role_lookup 'arn:aws:iam::1234567890:user/jo.bloggs1'
+    stub_current_identity 'arn:aws:iam::blah-account:user/jo.bloggs1'
 
     spy_on 'assume_role_for_user'
 
@@ -70,7 +76,15 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
-@test 'force fail' {
-    run echo bob
-    assert_output 'not bob'
+@test '_assume_environment_role uses user roles if current identity is RepoAdmin role' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoAdmin/blah-session'
+
+    spy_on 'assume_role_for_user'
+
+    run _assume_environment_role
+
+    assert was_called 'assume_role_for_user'
 }
+
+
