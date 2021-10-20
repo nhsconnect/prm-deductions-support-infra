@@ -1,3 +1,9 @@
+### 0.2.12 (2021-Oct-20)
+
+Now prompting users to assume initial environment role directly
+
+Added bats tests for assume role logic
+
 ### 0.2.11 (2021-Oct-14)
 
 Changed to assume roles direct from user account
