@@ -65,15 +65,66 @@ spy_on() {
     assert was_called 'assume_role_for_ci_agent'
 }
 
-@test '_assume_environment_role uses user roles if current identity is a user' {
+@test '_assume_environment_role prompts users to assume RepoAdmin directly in dev account' {
 
     stub_current_identity 'arn:aws:iam::blah-account:user/jo.bloggs1'
 
-    spy_on 'assume_role_for_user'
+    run _assume_environment_role dev
 
-    run _assume_environment_role
+    assert_output --partial 'Please assume RepoAdmin in dev directly from your shell'
+    refute_output --partial 'Assuming RepoAdmin'
+}
 
-    assert was_called 'assume_role_for_user'
+@test '_assume_environment_role prompts users to assume RepoAdmin directly in test account' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:user/ham.solo1'
+
+    run _assume_environment_role test
+
+    assert_output --partial 'Please assume RepoAdmin in test directly from your shell'
+    refute_output --partial 'Assuming'
+}
+
+@test '_assume_environment_role prompts users to assume RepoDeveloper directly in pre-prod account' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:user/jack.frost1'
+
+    run _assume_environment_role pre-prod
+
+    assert_output --partial 'Please assume RepoDeveloper in pre-prod directly from your shell'
+    refute_output --partial 'Assuming'
+}
+
+@test '_assume_environment_role prompts users to assume RepoDeveloper directly in prod account' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
+
+    run _assume_environment_role prod
+
+    assert_output --partial 'Please assume RepoDeveloper in prod directly from your shell'
+    refute_output --partial 'Assuming'
+}
+
+@test '_assume_environment_role prompts users to assume BootstrapAdmin directly in pre-prod account' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
+
+    is_bootstrap_admin=true
+    run _assume_environment_role pre-prod $is_bootstrap_admin
+
+    assert_output --partial 'Please assume BootstrapAdmin in pre-prod directly from your shell'
+    refute_output --partial 'Assuming'
+}
+
+@test '_assume_environment_role prompts users to assume BootstrapAdmin directly in prod account' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:user/loopy.liu1'
+
+    is_bootstrap_admin=true
+    run _assume_environment_role prod $is_bootstrap_admin
+
+    assert_output --partial 'Please assume BootstrapAdmin in prod directly from your shell'
+    refute_output --partial 'Assuming'
 }
 
 @test '_assume_environment_role uses user roles if current identity is RepoAdmin role' {
