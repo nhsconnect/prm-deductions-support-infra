@@ -87,4 +87,34 @@ spy_on() {
     assert was_called 'assume_role_for_user'
 }
 
+@test '_assume_environment_role uses user roles if current identity is BootstrapAdmin role' {
 
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/BootstrapAdmin/blah-session'
+
+    spy_on 'assume_role_for_user'
+
+    run _assume_environment_role
+
+    assert was_called 'assume_role_for_user'
+}
+
+@test '_assume_environment_role uses user roles if current identity is RepoDeveloper role' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoDeveloper/blah-session'
+
+    spy_on 'assume_role_for_user'
+
+    run _assume_environment_role
+
+    assert was_called 'assume_role_for_user'
+}
+
+
+@test '_assume_environment_role displays helpful message if attempting to use from NHSDAdminRole' {
+
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/NHSDAdminRole/blah-session'
+
+    run _assume_environment_role
+
+    assert_output --partial 'assume role direct from your user identity'
+}
