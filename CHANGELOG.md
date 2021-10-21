@@ -1,3 +1,7 @@
+### 0.2.16 (2021-Oct-21)
+
+Ensure default case for assume env role with debug logging.
+
 ### 0.2.15 (2021-Oct-21)
 
 Fully switched over to new simplified scheme.

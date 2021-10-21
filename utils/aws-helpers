@@ -7,6 +7,7 @@ DOJO_IMAGE_VERSION="nhsdev/deductions-infra-dojo:a3ce7038c095298273348419769e327
 readonly EXIT_CODE_GENERAL_FAILURE=5
 readonly EXIT_CODE_DONT_USE_NHSDADMINROLE=6
 readonly EXIT_CODE_USERS_SHOULD_ASSUME_ROLE_FIRST=7
+readonly EXIT_CODE_UNHANDLED_IDENTITY=18
 
 function get_latest_commit_hash {
   export COMMIT_HASH=$(git rev-parse HEAD | cut -c 1-7)
@@ -90,18 +91,21 @@ function _assume_environment_role {
   # The starting role for people is their personal user in the nhsd-identities account
   environment=$1
   is_bootstrap_admin=$2
-  current_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
+  current_identity_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
-  if [[ $current_account_arn =~ "gocd_agent-prod" ]]; then
+  if [[ $current_identity_arn =~ "gocd_agent-prod" ]]; then
     assume_role_for_ci_agent "${environment}"
-  elif [[ $current_account_arn =~ "user" || $current_account_arn =~ "RepoAdmin" || $current_account_arn =~ "BootstrapAdmin" || $current_account_arn =~ "RepoDeveloper" ]]; then
-     assume_role_for_user "${environment}" "${current_account_arn}" "${is_bootstrap_admin}"
-  elif [[ $current_account_arn =~ "NHSDAdminRole" ]]; then
+  elif [[ $current_identity_arn =~ "user" || $current_identity_arn =~ "RepoAdmin" || $current_identity_arn =~ "BootstrapAdmin" || $current_identity_arn =~ "RepoDeveloper" ]]; then
+     assume_role_for_user "${environment}" "${current_identity_arn}" "${is_bootstrap_admin}"
+  elif [[ $current_identity_arn =~ "NHSDAdminRole" ]]; then
     >&2 echo "You are using NHSDAdminRole which is now deprecated for general use. Clear assumed role with:"
     >&2 echo "  unset AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID AWS_SECURITY_TOKEN"
     >&2 echo "You should assume role direct from your user identity."
     exit $EXIT_CODE_DONT_USE_NHSDADMINROLE
+  else
+    >&2 echo "_assume_environment_role does not recognise current unhandled identity $current_identity_arn."
+    exit $EXIT_CODE_UNHANDLED_IDENTITY
   fi
 
   if [[ ! -z $json ]]; then
@@ -133,9 +137,9 @@ function prompt_user_to_assume_role {
 
 function assume_role_for_user {
   environment=$1
-  current_account_arn=$2
+  current_identity_arn=$2
   is_bootstrap_admin=$3
-  if [[ ! $current_account_arn =~ "user" ]]; then
+  if [[ ! $current_identity_arn =~ "user" ]]; then
     return
   fi
 

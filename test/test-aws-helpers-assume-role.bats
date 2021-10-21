@@ -196,3 +196,15 @@ it=_assume_environment_role
     assert_output --partial 'assume role direct from your user identity'
     assert_equal $status $exit_code_dont_use_nhsdadminrole
 }
+
+
+@test '$it fails fast if using an unexpected role' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/SomeNonExistentRole/blah-session'
+    exit_code_unhandled_identity=18
+
+    run _assume_environment_role
+
+    assert_output --partial 'unhandled identity'
+    assert_output --partial 'SomeNonExistentRole'
+    assert_equal $status $exit_code_unhandled_identity
+}
