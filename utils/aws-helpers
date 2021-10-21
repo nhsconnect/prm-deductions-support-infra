@@ -85,6 +85,7 @@ function _clear_aws_env_credentials {
 
 function _assume_environment_role {
   # Agent always needs to assume Deployer role in one of the destination accounts
+  # Deployer needs to assume role back in CI for
   # People need to assume RepoAdmin role in early, non-strict (dev/test) accounts
   # People need to assume BootstrapAdmin or RepoDeveloper role in prod-like, strict (pre-prod/prod) accounts
   # The starting role for the agent is gocd_agent-prod in the CI account
@@ -94,7 +95,7 @@ function _assume_environment_role {
   current_identity_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
-  if [[ $current_identity_arn =~ "gocd_agent-prod" ]]; then
+  if [[ $current_identity_arn =~ "gocd_agent-prod" || $current_identity_arn =~ "Deployer" ]]; then
     assume_role_for_ci_agent "${environment}"
   elif [[ $current_identity_arn =~ "user" || $current_identity_arn =~ "RepoAdmin" || $current_identity_arn =~ "BootstrapAdmin" || $current_identity_arn =~ "RepoDeveloper" ]]; then
      assume_role_for_user "${environment}" "${current_identity_arn}" "${is_bootstrap_admin}"

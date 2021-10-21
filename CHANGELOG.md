@@ -1,3 +1,8 @@
+### 0.2.17 (2021-Oct-21)
+
+If currently a Deployer, attempt to assume new env role as another Deployer, for the
+purposes of docker promotion process.
+
 ### 0.2.16 (2021-Oct-21)
 
 Ensure default case for assume env role with debug logging.

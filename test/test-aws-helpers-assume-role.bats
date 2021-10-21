@@ -62,6 +62,23 @@ it=_assume_environment_role
     assert_output --partial 'Assuming Deployer'
 }
 
+@test '$it uses ci agent roles if current identity is the env account Deployer, needed for scripted docker promotion' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/Deployer/blah-session'
+    spy_on 'assume_role_for_ci_agent'
+
+    run _assume_environment_role
+
+    assert was_called 'assume_role_for_ci_agent'
+}
+
+@test '$it assumes target env Deployer role when assuming role as another env Deployer for promotion purposes' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/Deployer/blah-session'
+
+    run _assume_environment_role
+
+    assert_output --partial 'Assuming Deployer'
+}
+
 @test '$it prompts users to assume broad-access RepoAdmin role directly in dev and exits' {
     stub_current_identity 'arn:aws:iam::blah-account:user/jo.bloggs1'
 
