@@ -1,4 +1,11 @@
+### 0.2.14 (2021-Oct-21)
+
+Ensure don't try and perform scripted assume-roles for users, just
+prompt them appropriately.
+
 ### 0.2.13 (2021-Oct-20)
+
+Fixes
 
 ### 0.2.12 (2021-Oct-20)
 
