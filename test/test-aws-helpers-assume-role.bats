@@ -137,6 +137,23 @@ it=_assume_environment_role
     assert was_called 'assume_role_for_user'
 }
 
+@test '$it does not attempt to assume role if user is already in RepoAdmin role in dev' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoAdmin/blah-session'
+
+    run _assume_environment_role dev
+
+    refute_output --partial 'Assuming'
+}
+
+
+@test '$it does not attempt to assume role if user is already in RepoAdmin role in test' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoAdmin/blah-session'
+
+    run _assume_environment_role test
+
+    refute_output --partial 'Assuming'
+}
+
 @test '$it uses user roles if they have already assumed env BootstrapAdmin role' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/BootstrapAdmin/blah-session'
     spy_on 'assume_role_for_user'
@@ -146,6 +163,14 @@ it=_assume_environment_role
     assert was_called 'assume_role_for_user'
 }
 
+@test '$it does not attempt to assume role if user is already in BootstrapAdmin role in pre-prod' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/BootstrapAdmin/blah-session'
+
+    run _assume_environment_role pre-prod
+
+    refute_output --partial 'Assuming'
+}
+
 @test '$it uses user roles if they have already assumed env RepoDeveloper role' {
     stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoDeveloper/blah-session'
     spy_on 'assume_role_for_user'
@@ -153,6 +178,14 @@ it=_assume_environment_role
     run _assume_environment_role
 
     assert was_called 'assume_role_for_user'
+}
+
+@test '$it does not attempt to assume role if user is already in RepoDeveloper role in pre-prod' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/RepoDeveloper/blah-session'
+
+    run _assume_environment_role pre-prod
+
+    refute_output --partial 'Assuming'
 }
 
 @test '$it warns users off using NHSDAdminRole if they have assumed it and exits' {
