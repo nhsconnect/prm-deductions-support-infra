@@ -1,3 +1,7 @@
+### 0.2.15 (2021-Oct-21)
+
+Use renamed Deployer role for ci agent deploying into envs (was repository-ci-agent).
+
 ### 0.2.14 (2021-Oct-21)
 
 Ensure don't try and perform scripted assume-roles for users, just

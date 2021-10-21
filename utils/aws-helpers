@@ -83,8 +83,9 @@ function _clear_aws_env_credentials {
 }
 
 function _assume_environment_role {
-  # Agent always needs to assume repository-ci-agent role in one of the destination accounts
-  # People always need to assume RepoAdmin role in one of the destination accounts
+  # Agent always needs to assume Deployer role in one of the destination accounts
+  # People need to assume RepoAdmin role in early, non-strict (dev/test) accounts
+  # People need to assume BootstrapAdmin or RepoDeveloper role in prod-like, strict (pre-prod/prod) accounts
   # The starting role for the agent is gocd_agent-prod in the CI account
   # The starting role for people is their personal user in the nhsd-identities account
   environment=$1
@@ -92,12 +93,11 @@ function _assume_environment_role {
   current_account_arn=$(aws sts get-caller-identity | jq -r .Arn)
   create_build_trace_id
 
-  if [[ $current_account_arn =~ "gocd_agent-prod" || $current_account_arn =~ "repository-ci-agent" ]]; then
+  if [[ $current_account_arn =~ "gocd_agent-prod" ]]; then
     assume_role_for_ci_agent "${environment}"
   elif [[ $current_account_arn =~ "user" || $current_account_arn =~ "RepoAdmin" || $current_account_arn =~ "BootstrapAdmin" || $current_account_arn =~ "RepoDeveloper" ]]; then
      assume_role_for_user "${environment}" "${current_account_arn}" "${is_bootstrap_admin}"
   elif [[ $current_account_arn =~ "NHSDAdminRole" ]]; then
-    # This is a human user who has already assumed admin role
     >&2 echo "You are using NHSDAdminRole which is now deprecated for general use. Clear assumed role with:"
     >&2 echo "  unset AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID AWS_SECURITY_TOKEN"
     >&2 echo "You should assume role direct from your user identity."
@@ -115,9 +115,12 @@ function _assume_environment_role {
 function assume_role_for_ci_agent {
   environment=$1
   _clear_aws_env_credentials
-  >&2 echo "Assuming CI agent's role in ${environment} account"
+  
+  ROLE_NAME='Deployer'
+
+  >&2 echo "Assuming $ROLE_NAME role for CI agent in ${environment} account"
   desired_account_id=$(_get_aws_ssm_secret "/repo/${environment}/user-input/external/aws-account-id")
-  desired_role_arn="arn:aws:iam::$desired_account_id:role/repository-ci-agent"
+  desired_role_arn="arn:aws:iam::$desired_account_id:role/$ROLE_NAME"
   >&2 echo "Build trace ID will be set as STS session name: $BUILD_TRACE_ID"
   json="$(aws sts assume-role --role-arn "$desired_role_arn" --role-session-name "$BUILD_TRACE_ID")"
 }

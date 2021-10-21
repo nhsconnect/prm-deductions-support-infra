@@ -54,13 +54,12 @@ it=_assume_environment_role
     assert was_called 'assume_role_for_ci_agent'
 }
 
-@test '$it uses ci agent roles if current identity is  the environment account agent role' {
-    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/repository-ci-agent/blah-session'
-    spy_on 'assume_role_for_ci_agent'
+@test '$it assumes env Deployer role when assuming role as gocd agent' {
+    stub_current_identity 'arn:aws:iam::blah-account:assumed-role/gocd_agent-prod/blah-session'
 
     run _assume_environment_role
 
-    assert was_called 'assume_role_for_ci_agent'
+    assert_output --partial 'Assuming Deployer'
 }
 
 @test '$it prompts users to assume broad-access RepoAdmin role directly in dev and exits' {
