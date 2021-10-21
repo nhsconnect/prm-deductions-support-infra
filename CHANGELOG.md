@@ -1,6 +1,7 @@
 ### 0.2.15 (2021-Oct-21)
 
-Use renamed Deployer role for ci agent deploying into envs (was repository-ci-agent).
+Fully switched over to new simplified scheme.
+Now use renamed Deployer role for ci agent deploying into envs (was repository-ci-agent).
 
 ### 0.2.14 (2021-Oct-21)
 
