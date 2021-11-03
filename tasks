@@ -68,7 +68,6 @@ case "${command}" in
       ;;
   _tf_plan)
       check_env
-      _assume_environment_role ${NHS_ENVIRONMENT} true
       configure_state_bucket_name
       aws s3 cp "s3://${STATE_BUCKET_NAME}/terraform.tfstate" terraform.tfstate
       tf_plan "$2"
