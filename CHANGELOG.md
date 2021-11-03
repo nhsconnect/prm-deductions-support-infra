@@ -1,3 +1,7 @@
+### 0.2.18 (2021-Nov-03)
+
+Introduced image promotion from pre-prod to prod
+
 ### 0.2.17 (2021-Oct-21)
 
 If currently a Deployer, attempt to assume new env role as another Deployer, for the
