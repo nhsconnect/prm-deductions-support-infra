@@ -14,9 +14,10 @@ pipelines:
       - test:
           tasks:
             - exec:
-                command: ./tasks
+                command: /bin/bash
                 arguments:
-                  - test
+                  - -c
+                  - ./tasks test
       - release:
           clean_workspace: true
           approval: manual
