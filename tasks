@@ -87,7 +87,7 @@ case "${command}" in
       ;;
 # bats-based script testing
   test)
-      docker run --rm -v $(pwd):/work --workdir /work bats/bats:v1.4.1 test
+      docker run --rm -v $(pwd):/work --workdir /work bats/bats test
       ;;
 # Release and management of lifecycle for aws-helpers script
   set_version)
