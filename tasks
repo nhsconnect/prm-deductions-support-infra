@@ -86,8 +86,12 @@ case "${command}" in
       dojo "./tasks _tf_apply"
       ;;
 # bats-based script testing
+  _test)
+      ./test/bats/bin/bats test
+      ;;
   test)
-      docker run --rm -v $(pwd):/work --workdir /work bats/bats:v1.4.1 test
+      git submodule update --init
+      dojo "./tasks _test"
       ;;
 # Release and management of lifecycle for aws-helpers script
   set_version)
