@@ -1,3 +1,7 @@
+### 0.2.19 (2022-Feb-09)
+
+Allow lower assume role auth duration for testing. Set `ASSUME_ROLE_DURATION` var to number of seconds - min 900.
+
 ### 0.2.18 (2021-Nov-03)
 
 Introduced image promotion from pre-prod to prod
