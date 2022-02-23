@@ -30,6 +30,7 @@ where
                     masked.push_str(&maybe)
                 }
                 digits = 0;
+                maybe.truncate(0);
                 masked.push(c);
             }
         }
@@ -144,6 +145,15 @@ mod tests {
         masker(&b"abc123\n456def789\n"[..], &mut output, 3);
 
         assert_eq!("abc***\n***def***\n", String::from_utf8(output).unwrap());
+    }
+
+    #[test]
+    fn test_copes_with_multiple_runs_of_shorter_digits() {
+        let mut output = Vec::new();
+
+        masker(&b"abc12__34__56\n"[..], &mut output, 3);
+
+        assert_eq!("abc12__34__56\n", String::from_utf8(output).unwrap());
     }
 }
 
