@@ -61,6 +61,10 @@ function setup_github_credentials {
   git remote set-url origin $NEW_URL
 }
 
+function check_rust {
+  which cargo || (echo "cargo not found!! install rustc and cargo first..." && exit 16)
+}
+
 command="$1"
 case "${command}" in
   tf)
@@ -85,11 +89,24 @@ case "${command}" in
   tf_apply)
       dojo "./tasks _tf_apply"
       ;;
+  _test_redactor)
+      check_rust
+      cargo test --manifest-path redactor/Cargo.toml
+      ;;
+  _build_redactor)
+      check_rust
+      echo Building redactor...
+      cargo build --manifest-path redactor/Cargo.toml --release
+      cp redactor/target/release/redactor ./utils/
+      ;;
   _test_scripts)
+      ./tasks _build_redactor
       ./test/bats/bin/bats test
       ;;
   _test)
+      ./tasks _test_redactor
       ./tasks _test_scripts
+      echo testing completed
       ;;
   setup_test_scripts)
       git submodule update --init
