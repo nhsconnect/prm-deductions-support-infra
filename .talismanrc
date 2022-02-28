@@ -3,5 +3,7 @@ fileignoreconfig:
   checksum: f2e4da4dfc22981641fe21b13c8cef755785845c1431427b3312ca6558251a21
 - filename: test/helpers/bats-support
   checksum: 2076897e3d8d1a27b5d649ebdf9637ea9de70464a8c45346e9054689157c1db3
+- filename: redactor/src/main.rs
+  checksum: ee591091d4fd625a98dd33fe1ec8a31a15e2a57a3123c3595722834e63d9df0c
 allowed_patterns:
 - pwd
