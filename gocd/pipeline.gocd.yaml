@@ -12,6 +12,10 @@ pipelines:
           - CHANGELOG.md
     stages:
       - test:
+          artifacts:
+            - build:
+                source: utils/redactor
+                destination: utils
           tasks:
             - exec:
                 command: /bin/bash
@@ -34,11 +38,12 @@ pipelines:
           jobs:
             code:
               tasks:
-                - exec:
-                    command: /bin/bash
-                    arguments:
-                      - -c
-                      - ./tasks build_redactor
+                - fetch:
+                    stage: test
+                    job: test
+                    is_file: yes
+                    source: utils/redactor
+                    destination: utils
                 - exec:
                     command: /bin/bash
                     arguments:

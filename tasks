@@ -95,10 +95,9 @@ case "${command}" in
       ;;
   _build_redactor)
       check_rust
-      echo Building LOCAL redactor...
+      echo Building statically linked redactor...
+      export RUSTFLAGS="-C target-feature=+crt-static"
       cargo build --manifest-path redactor/Cargo.toml --release
-      echo Building GNU LINUX redactor...
-      cargo build --manifest-path redactor/Cargo.toml --release --target x86_64-unknown-linux-gnu
       ;;
   _test_scripts)
       ./tasks _build_redactor
@@ -161,7 +160,7 @@ case "${command}" in
         --repo $GITHUB_REPO \
         --tag $AWS_HELPERS_VERSION \
         --name "redactor" \
-        --file redactor/target/x86_64-unknown-linux-gnu/release/redactor  # NB: this is the GNU LINUX one... we build on alpine/musl but run on gnu libc
+        --file utils/redactor
 
       $GHRELEASE_BIN upload \
         --user $GITHUB_USER \

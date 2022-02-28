@@ -1,3 +1,7 @@
+### 0.2.22 (2022-Feb-28)
+
+Switch to statically linked `redactor`.
+
 ### 0.2.21 (2022-Feb-28)
 
 Release the glibc-based `redactor` not the musl one built by default on alpine.
