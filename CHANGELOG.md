@@ -1,3 +1,7 @@
+### 0.2.21 (2022-Feb-28)
+
+Release the glibc-based `redactor` not the musl one built by default on alpine.
+
 ### 0.2.20 (2022-Feb-28)
 
 Added redaction utils to release:
