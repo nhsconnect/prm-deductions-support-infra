@@ -1,3 +1,9 @@
+### 0.2.20 (2022-Feb-28)
+
+Added redaction utils to release:
+* `run-with-redaction.sh` - top level script
+* `redactor` - redaction filter binary
+
 ### 0.2.19 (2022-Feb-09)
 
 Allow lower assume role auth duration for testing. Set `ASSUME_ROLE_DURATION` var to number of seconds - min 900.

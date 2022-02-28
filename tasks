@@ -135,7 +135,7 @@ case "${command}" in
       setup_github_credentials
       export GITHUB_TOKEN=$(echo $GITHUB_CREDENTIALS | cut -d ":" -f 2)
       releaser::prepare_github_release_bin
-      echo releasing version $AWS_HELPERS_VERSION aws-helpers
+      echo releasing version $AWS_HELPERS_VERSION aws-helpers and redaction utils
       GITHUB_USER=nhsconnect
       GITHUB_REPO=prm-deductions-support-infra
       $GHRELEASE_BIN release \
@@ -150,5 +150,19 @@ case "${command}" in
         --tag $AWS_HELPERS_VERSION \
         --name "aws-helpers" \
         --file utils/aws-helpers
+
+      $GHRELEASE_BIN upload \
+        --user $GITHUB_USER \
+        --repo $GITHUB_REPO \
+        --tag $AWS_HELPERS_VERSION \
+        --name "redactor" \
+        --file utils/redactor
+
+      $GHRELEASE_BIN upload \
+        --user $GITHUB_USER \
+        --repo $GITHUB_REPO \
+        --tag $AWS_HELPERS_VERSION \
+        --name "run-with-redaction.sh" \
+        --file utils/run-with-redaction.sh
       ;;
 esac
