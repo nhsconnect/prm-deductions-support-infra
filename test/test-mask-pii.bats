@@ -7,7 +7,7 @@ setup() {
 
 mask_pii_from_input() {
   input=$1
-  output=$(echo $input | ../utils/mask-pii.sh)
+  output=$(echo $input | ./utils/mask-pii.sh)
   echo $output
 }
 

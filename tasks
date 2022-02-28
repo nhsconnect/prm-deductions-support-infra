@@ -85,12 +85,20 @@ case "${command}" in
   tf_apply)
       dojo "./tasks _tf_apply"
       ;;
-# bats-based script testing
-  _test)
+  _test_scripts)
       ./test/bats/bin/bats test
       ;;
-  test)
+  _test)
+      ./tasks _test_scripts
+      ;;
+  setup_test_scripts)
       git submodule update --init
+      ;;
+  setup_test)
+      ./tasks setup_test_scripts
+      ;;
+  test)
+      ./tasks setup_test
       dojo "./tasks _test"
       ;;
 # Release and management of lifecycle for aws-helpers script
