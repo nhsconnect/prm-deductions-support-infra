@@ -15,8 +15,12 @@ echo_with_redaction() {
     echo_with_redaction "$input"
 
     assert_output '##########'
+}
 
+@test '$it should redact stderr as well' {
+    output=$(./utils/run-with-redaction.sh ./test/echo-to-stderr foo1234567890baz | grep -v 'Running command')
 
+    assert_output 'foo##########baz'
 }
 
 @test '$it should mask 10 digit number in quotes' {

@@ -1,3 +1,3 @@
 #!/bin/bash
 echo "Running command '$*' with redaction..."
-./utils/redactor < <($*)
+./utils/redactor < <($* 2>&1)
