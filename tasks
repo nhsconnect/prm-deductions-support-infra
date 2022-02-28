@@ -99,10 +99,10 @@ case "${command}" in
       cargo build --manifest-path redactor/Cargo.toml --release
       echo Building GNU LINUX redactor...
       cargo build --manifest-path redactor/Cargo.toml --release --target x86_64-unknown-linux-gnu
-      cp redactor/target/release/redactor ./utils/
       ;;
   _test_scripts)
       ./tasks _build_redactor
+      cp redactor/target/release/redactor ./utils/
       ./test/bats/bin/bats test
       ;;
   _test)
@@ -119,6 +119,9 @@ case "${command}" in
   test)
       ./tasks setup_test
       dojo "./tasks _test"
+      ;;
+  build_redactor)
+      dojo "./tasks _build_redactor"
       ;;
 # Release and management of lifecycle for aws-helpers script
   set_version)
