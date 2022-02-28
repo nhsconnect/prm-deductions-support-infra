@@ -1,6 +1,6 @@
 use std::io::{self, BufRead, Write};
 
-pub fn masker<R, W>(input: R, mut output: W, num_digits: i32)
+pub fn masker<R, W>(input: R, mut output: W, num_digits: usize)
     where
         R: BufRead,
         W: Write,
@@ -10,31 +10,31 @@ pub fn masker<R, W>(input: R, mut output: W, num_digits: i32)
         mask.push('#');
     }
 
+
+    let mut redactions = Vec::new();
+
     for maybe_line in input.lines() {
         let mut line = maybe_line.expect("Failed to read line");
-        // Try to convert a string into a number
-        let mut masked = String::new();
-        let mut maybe = String::new();
-        let mut digits = 0;
         line.push('\n');
-        for c in line.chars() {
+        let mut digits = 0;
+        redactions.clear();
+        for (i, c) in line.chars().enumerate() {
             if c.is_digit(10) {
                 digits += 1;
-                maybe.push(c);
             }
             else {
                 if digits == num_digits {
-                    masked.push_str(&mask);
-                }
-                else if digits > 0 {
-                    masked.push_str(&maybe)
+                    redactions.push(i - digits);
                 }
                 digits = 0;
-                maybe.truncate(0);
-                masked.push(c);
             }
         }
-        write!(&mut output, "{}", masked).expect("failed to write");
+
+        for redaction in &redactions {
+            let redaction_end = redaction + num_digits;
+            line.replace_range(redaction..&redaction_end, &mask);
+        }
+        write!(&mut output, "{}", line).expect("failed to write");
     }
     ()
 }
