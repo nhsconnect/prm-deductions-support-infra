@@ -1,1 +1,1 @@
-DOJO_DOCKER_IMAGE="nhsdev/deductions-infra-dojo:19-99432ac7"
+DOJO_DOCKER_IMAGE="nhsdev/deductions-infra-dojo:20-b96f16e4"
