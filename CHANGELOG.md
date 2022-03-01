@@ -1,3 +1,7 @@
+### 0.2.25 (2022-Mar-01)
+
+Bug fix for panic in edge case with UUID exception detection.
+
 ### 0.2.24 (2022-Mar-01)
 
 Add UUID exception to redaction: will not redact if 10-digit sequence is part of (last block) of hyphenated UUID.
