@@ -2,3 +2,6 @@
 name = "redactor"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+uuid = "0.8.2"
