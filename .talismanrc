@@ -5,5 +5,7 @@ fileignoreconfig:
   checksum: 2076897e3d8d1a27b5d649ebdf9637ea9de70464a8c45346e9054689157c1db3
 - filename: redactor/src/main.rs
   checksum: ee591091d4fd625a98dd33fe1ec8a31a15e2a57a3123c3595722834e63d9df0c
+- filename: redactor/Cargo.lock
+  checksum: f23d21b0d52ad5ebfeb53f86ea2052ce12a90ab7a0623a7cfff2d89d15851daf
 allowed_patterns:
 - pwd
