@@ -175,8 +175,8 @@ function promote_docker_image {
     >&2 echo "Environment must be specified. e.g. dev"
     exit $EXIT_CODE_GENERAL_FAILURE;
   fi
-  declare -A from_environment_promotion_map=(["dev"]="ci" ["test"]="dev" ["pre-prod"]="test" ["prod"]="pre-prod")
-  declare -A to_environment_promotion_map=(["dev"]="dev" ["test"]="test" ["pre-prod"]="pre-prod" ["prod"]="prod")
+  declare -A from_environment_promotion_map=(["dev"]="ci" ["test"]="dev" ["pre-prod"]="test" ["prod"]="pre-prod" ["perf"]="test")
+  declare -A to_environment_promotion_map=(["dev"]="dev" ["test"]="test" ["pre-prod"]="pre-prod" ["prod"]="prod" ["perf"]="perf")
 
   environment_from=${from_environment_promotion_map[$ENVIRONMENT]}
   environment_to=${to_environment_promotion_map[$ENVIRONMENT]}

@@ -1,3 +1,7 @@
+### 0.2.23 (2022-Mar-01)
+Introduced image promotion to perf environment.
+
+
 ### 0.2.22 (2022-Feb-28)
 
 Switch to statically linked `redactor`.
