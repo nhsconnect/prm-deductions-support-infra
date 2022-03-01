@@ -46,22 +46,30 @@ fn find_digit_sequences(num_digits: usize, line: & String) -> Vec<usize> {
     return sequences;
 }
 
-const UUID_TEN_DIGIT_START_INDEX_FIRST_POSITION: usize = 24;
+const UUID_TEN_DIGIT_START_INDEX_FIRST_POSITION: i32 = 24;
 
 pub fn is_in_uuid(ten_digit_start_position: usize, line: &String) -> bool {
-    if ten_digit_start_position < UUID_TEN_DIGIT_START_INDEX_FIRST_POSITION {
+    if ten_digit_start_position < UUID_TEN_DIGIT_START_INDEX_FIRST_POSITION as usize {
         return false;
     }
-    let mut maybe_hyphen = line.chars();
-    maybe_hyphen.nth(ten_digit_start_position - 4);
-    for ten_digit_index_in_last_block in (0..3).rev() { // third(2), second(1), first(0) position
-        if maybe_hyphen.next().unwrap() == '-' {
-            let last_block_index_in_line = ten_digit_start_position - ten_digit_index_in_last_block;
-            let maybe_uuid_start_index = last_block_index_in_line - UUID_TEN_DIGIT_START_INDEX_FIRST_POSITION;
-            return is_uuid(line.clone(), maybe_uuid_start_index);
-        }
+    let uuid_start_index = find_uuid_start_candidate(ten_digit_start_position, line);
+    if uuid_start_index > -1 {
+        return is_uuid(line.clone(), uuid_start_index as usize);
     }
     return false;
+}
+
+fn find_uuid_start_candidate(ten_digits_start_position: usize, line: &String) -> i32 {
+    let mut maybe_hyphen = line.chars();
+    maybe_hyphen.nth(ten_digits_start_position - 4);
+    for hyphen_offset in [2, 1, 0] { // go through potential hyphen offsets just before 10 digits
+        if maybe_hyphen.next().unwrap() == '-' {
+            let last_block_index_in_line: i32 = (ten_digits_start_position - hyphen_offset) as i32;
+
+            return last_block_index_in_line - UUID_TEN_DIGIT_START_INDEX_FIRST_POSITION;
+        }
+    }
+    -1
 }
 
 fn is_uuid(line: String, maybe_uuid_start_index: usize) -> bool {
@@ -270,5 +278,14 @@ mod tests {
 
         assert_eq!(single_uuid_line.chars().nth(57).unwrap(), '1');
         assert_eq!(in_uuid, true);
+    }
+
+    #[test]
+    fn test_recognises_that_ten_digit_sequence_is_not_in_uuid_when_position_is_possible_but_previous_hyphen_is_misleading() {
+        let single_uuid_line = String::from("2523fa52-1719-4300-9b-ef1234567890ab");
+        let in_uuid = is_in_uuid(24, &single_uuid_line);
+
+        assert_eq!(single_uuid_line.chars().nth(24).unwrap(), '1');
+        assert_eq!(in_uuid, false);
     }
 }
