@@ -1,6 +1,10 @@
-### 0.2.23 (2022-Mar-01)
-Introduced image promotion to perf environment.
+### 0.2.24 (2022-Mar-01)
 
+Add UUID exception to redaction: will not redact if 10-digit sequence is part of (last block) of hyphenated UUID.
+
+### 0.2.23 (2022-Mar-01)
+
+Introduced image promotion to perf environment.
 
 ### 0.2.22 (2022-Feb-28)
 
