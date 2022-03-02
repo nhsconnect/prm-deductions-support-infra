@@ -1,3 +1,7 @@
+### 0.2.26 (2022-Mar-02)
+
+`run-with-redaction.sh` now ensures propagation of app exit code to caller.
+
 ### 0.2.25 (2022-Mar-01)
 
 Bug fix for panic in edge case with UUID exception detection.
