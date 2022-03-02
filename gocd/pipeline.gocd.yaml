@@ -13,6 +13,7 @@ pipelines:
           - CHANGELOG.md
     stages:
       - build-utils:
+          clean_workspace: true
           artifacts:
             - build:
                 source: utils/redactor
@@ -40,7 +41,7 @@ pipelines:
             code:
               tasks:
                 - fetch:
-                    stage: test
+                    stage: build-utils
                     job: test
                     is_file: yes
                     source: utils/redactor
