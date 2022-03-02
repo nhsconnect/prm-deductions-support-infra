@@ -42,7 +42,7 @@ pipelines:
               tasks:
                 - fetch:
                     stage: build-utils
-                    job: test
+                    job: build-utils
                     is_file: yes
                     source: utils/redactor
                     destination: utils
