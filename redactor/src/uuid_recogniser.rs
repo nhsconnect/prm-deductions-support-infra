@@ -13,10 +13,21 @@ pub fn is_in_uuid(ten_digit_start_position: usize, line: &String) -> bool {
     return false;
 }
 
+//
+// if ten digit sequence is in hyphenated uuid then it can only be in the last block
+// at a 0, 1 or 2 offset from start of it:
+//
+// e.g. in 12345678-1234-1234-1234-1234567890ab
+//                                ^^^^
+//                               / \|/
+//                               |  i.e. in one of these 3 places
+//                               |
+// so we look back for the prior / hyphen which lets us determine, if present, the uuid position
+//
 fn find_uuid_start_candidate(ten_digits_start_position: usize, line: &String) -> i32 {
     let mut maybe_hyphen = line.chars();
     maybe_hyphen.nth(ten_digits_start_position - 4);
-    for hyphen_offset in [2, 1, 0] { // go through potential hyphen offsets just before 10 digits
+    for hyphen_offset in [2, 1, 0] {
         if maybe_hyphen.next().unwrap() == '-' {
             let last_block_index_in_line: i32 = (ten_digits_start_position - hyphen_offset) as i32;
 
