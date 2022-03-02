@@ -71,3 +71,15 @@ echo_with_redaction() {
 
     assert_output '01234567899'
 }
+
+@test '$it should exit with code if run target exits with code 0' {
+    run ./utils/run-with-redaction.sh echo bob
+
+    assert_success
+}
+
+@test '$it should exit with the failure exit code if run target fails' {
+    run ./utils/run-with-redaction.sh rm doesnt_exist
+
+    assert_failure 1
+}
