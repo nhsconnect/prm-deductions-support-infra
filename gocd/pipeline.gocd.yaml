@@ -64,14 +64,16 @@ pipelines:
           tasks:
             - exec:
                 command: echo
-                arguments: "deprecated pipeline for history only - go see support-infra pipeline"
+                arguments:
+                  - "deprecated pipeline for history only - go see support-infra pipeline"
       - release:
           jobs:
             code:
               tasks:
                 - exec:
                     command: echo
-                    arguments: "deprecated pipeline for history only - go see support-infra pipeline"
+                    arguments:
+                      - "deprecated pipeline for history only - go see support-infra pipeline"
       - publish:
           clean_workspace: true
           jobs:
@@ -79,4 +81,5 @@ pipelines:
               tasks:
                 - exec:
                     command: echo
-                    arguments: "deprecated pipeline for history only - go see support-infra pipeline"
+                    arguments:
+                      - "deprecated pipeline for history only - go see support-infra pipeline"
