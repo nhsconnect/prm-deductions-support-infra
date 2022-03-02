@@ -1,17 +1,18 @@
 format_version: 3
 pipelines:
-  aws-helpers:
-    group: deductions
-    label_template: "${git[:8]}"
+  support-infra:
+    group: shared-components
+    label_template: "${COUNT}-${git[:8]}"
     materials:
       git:
         type: configrepo
         includes:
-          - utils/aws-helpers
-          - 'test/**/*.*'
+          - 'utils/*'
+          - 'redactor/**/*'
+          - 'test/**/*'
           - CHANGELOG.md
     stages:
-      - test:
+      - build-utils:
           artifacts:
             - build:
                 source: utils/redactor
@@ -22,7 +23,7 @@ pipelines:
                 arguments:
                   - -c
                   - ./tasks test
-      - release:
+      - check-release:
           clean_workspace: true
           approval: manual
           jobs:
@@ -33,7 +34,7 @@ pipelines:
                     arguments:
                       - -c
                       - ./tasks release
-      - publish:
+      - publish-utils:
           clean_workspace: true
           jobs:
             code:
@@ -49,3 +50,33 @@ pipelines:
                     arguments:
                       - -c
                       - ./tasks publish
+  aws-helpers:
+    group: repo-history
+    label_template: "${git[:8]}"
+    materials:
+      git:
+        type: configrepo
+        includes:
+          - not_a_file_this_is_history
+    stages:
+      - test:
+          approval: manual
+          tasks:
+            - exec:
+                command: echo
+                arguments: "deprecated pipeline for history only - go see support-infra pipeline"
+      - release:
+          jobs:
+            code:
+              tasks:
+                - exec:
+                    command: echo
+                    arguments: "deprecated pipeline for history only - go see support-infra pipeline"
+      - publish:
+          clean_workspace: true
+          jobs:
+            code:
+              tasks:
+                - exec:
+                    command: echo
+                    arguments: "deprecated pipeline for history only - go see support-infra pipeline"
