@@ -56,8 +56,6 @@ pipelines:
     materials:
       git:
         type: configrepo
-        includes:
-          - not_a_file_this_is_history
     stages:
       - test:
           approval: manual
@@ -75,7 +73,6 @@ pipelines:
                     arguments:
                       - "deprecated pipeline for history only - go see support-infra pipeline"
       - publish:
-          clean_workspace: true
           jobs:
             code:
               tasks:
