@@ -83,3 +83,18 @@ echo_with_redaction() {
 
     assert_failure 1
 }
+
+@test '$it should run with redaction in a dir that we cannot write to' {
+    unwritable_dir='/tmp/unwritable_dir_for_redaction_test'
+    rm -rf $unwritable_dir
+    mkdir -p $unwritable_dir
+    chmod -w $unwritable_dir
+    redaction_script="$(pwd)/utils/run-with-redaction.sh"
+    pushd $unwritable_dir
+    
+    run $redaction_script echo good
+
+    popd
+
+    assert_success
+}
