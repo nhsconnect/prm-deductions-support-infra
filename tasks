@@ -145,30 +145,27 @@ case "${command}" in
       echo releasing version $AWS_HELPERS_VERSION aws-helpers and redaction utils
       GITHUB_USER=nhsconnect
       GITHUB_REPO=prm-deductions-support-infra
-      $GHRELEASE_BIN release \
+      $GHRELEASE_BIN --verbose release \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
-        --verbose \
         --tag $AWS_HELPERS_VERSION \
         --name $AWS_HELPERS_VERSION
 
-      $GHRELEASE_BIN upload \
+      $GHRELEASE_BIN --verbose upload \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
         --tag $AWS_HELPERS_VERSION \
-        --verbose \
         --name "aws-helpers" \
         --file utils/aws-helpers
 
-      $GHRELEASE_BIN upload \
+      $GHRELEASE_BIN --verbose upload \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
-        --verbose \
         --tag $AWS_HELPERS_VERSION \
         --name "redactor" \
         --file utils/redactor
 
-      $GHRELEASE_BIN upload \
+      $GHRELEASE_BIN --verbose upload \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
         --tag $AWS_HELPERS_VERSION \
