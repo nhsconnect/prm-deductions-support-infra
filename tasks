@@ -151,6 +151,13 @@ case "${command}" in
         --tag $AWS_HELPERS_VERSION \
         --name $AWS_HELPERS_VERSION
 
+      echo waiting for release version $AWS_HELPERS_VERSION
+      until curl --silent https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases | jq '.[].tag_name' | grep $AWS_HELPERS_VERSION
+      do
+        echo "Release not there yet, hang on a mo..."
+        sleep 2
+      done
+
       $GHRELEASE_BIN --verbose upload \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
