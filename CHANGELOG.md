@@ -1,6 +1,6 @@
 ### 0.2.27 (2022-Mar-14)
 
-Ensure redaction script uses $HOME dir for temp files in case of unwritable execution dir.
+Ensure redaction script uses HOME dir for temp files in case of unwritable execution dir.
 
 ### 0.2.26 (2022-Mar-02)
 
