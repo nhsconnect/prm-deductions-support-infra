@@ -127,14 +127,17 @@ case "${command}" in
       releaser::bump_changelog_version "$2" "$3"
       ;;
   verify_version)
+      set -x
       releaser::verify_release_ready
       ;;
   release)
+      set -x
       releaser::verify_release_ready
       setup_github_credentials
       releaser::git_tag_from_changelog
       ;;
   publish)
+      set -x
       # publish the just released version
       setup_github_credentials
       export GITHUB_TOKEN=$(echo $GITHUB_CREDENTIALS | cut -d ":" -f 2)
