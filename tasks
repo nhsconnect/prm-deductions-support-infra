@@ -127,17 +127,14 @@ case "${command}" in
       releaser::bump_changelog_version "$2" "$3"
       ;;
   verify_version)
-      set -x
       releaser::verify_release_ready
       ;;
   release)
-      set -x
       releaser::verify_release_ready
       setup_github_credentials
       releaser::git_tag_from_changelog
       ;;
   publish)
-      set -x
       # publish the just released version
       setup_github_credentials
       export GITHUB_TOKEN=$(echo $GITHUB_CREDENTIALS | cut -d ":" -f 2)
@@ -145,7 +142,7 @@ case "${command}" in
       echo releasing version $AWS_HELPERS_VERSION aws-helpers and redaction utils
       GITHUB_USER=nhsconnect
       GITHUB_REPO=prm-deductions-support-infra
-      $GHRELEASE_BIN --verbose release \
+      $GHRELEASE_BIN release \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
         --tag $AWS_HELPERS_VERSION \
@@ -158,21 +155,21 @@ case "${command}" in
         sleep 2
       done
 
-      $GHRELEASE_BIN --verbose upload \
+      $GHRELEASE_BIN upload \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
         --tag $AWS_HELPERS_VERSION \
         --name "aws-helpers" \
         --file utils/aws-helpers
 
-      $GHRELEASE_BIN --verbose upload \
+      $GHRELEASE_BIN upload \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
         --tag $AWS_HELPERS_VERSION \
         --name "redactor" \
         --file utils/redactor
 
-      $GHRELEASE_BIN --verbose upload \
+      $GHRELEASE_BIN upload \
         --user $GITHUB_USER \
         --repo $GITHUB_REPO \
         --tag $AWS_HELPERS_VERSION \
