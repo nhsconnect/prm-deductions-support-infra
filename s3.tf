@@ -31,6 +31,7 @@ resource "aws_s3_bucket_versioning" "prm_deductions_versioning" {
   bucket = aws_s3_bucket.prm_deductions_terraform_state.id
   versioning_configuration {
     status = "Enabled"
+    mfa_delete = "Enabled"
   }
 }
 
@@ -97,6 +98,7 @@ resource "aws_s3_bucket_versioning" "prm_deductions_state_store_versioning" {
   bucket = aws_s3_bucket.prm_deductions_terraform_state_store.id
   versioning_configuration {
     status = "Enabled"
+    mfa_delete = "Enabled"
   }
 }
 
