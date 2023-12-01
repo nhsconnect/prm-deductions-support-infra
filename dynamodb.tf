@@ -5,7 +5,7 @@ resource "aws_dynamodb_table" "prm-deductions-terraform-table" {
   read_capacity               = 2
   write_capacity              = 2
   hash_key                    = "LockID"
-  deletion_protection_enabled = true
+#  deletion_protection_enabled = true
 
   point_in_time_recovery {
     enabled = true
