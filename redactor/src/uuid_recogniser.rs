@@ -17,7 +17,7 @@ pub fn is_in_uuid(ten_digit_start_position: usize, line: &String) -> bool {
 // if ten digit sequence is in hyphenated uuid then it can only be in the last block
 // at a 0, 1 or 2 offset from start of it:
 //
-// e.g. in 12345678-1234-1234-1234-1234567890ab
+// e.g. in 12345678-4567-4567-4567-1234567890ab
 //                                ^^^^
 //                               / \|/
 //                               |  i.e. in one of these 3 places
